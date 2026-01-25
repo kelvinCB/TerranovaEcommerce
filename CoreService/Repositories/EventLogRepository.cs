@@ -22,14 +22,14 @@ namespace CoreService.Repositories
         {
             try
             {
-                await _db.Database.ExecuteSqlInterpolatedAsync($"EXEC dbo.sp_InsertLog @SourceSystem = {sourceSystem},@UserId = {userId},@Description = {description},@Action = {action}");
+                await _db.Database.ExecuteSqlInterpolatedAsync($"EXEC dbo.InsertLog @SourceSystem = {sourceSystem},@UserId = {userId},@Description = {description},@Action = {action}");
             }
             catch (Exception ex)
             {
                 string limitedMessage = ex.Message.Length > 500 ? ex.Message.Substring(0, 500) : ex.Message;
                 string typeAction = "Error";
 
-                await _db.Database.ExecuteSqlInterpolatedAsync($"EXEC dbo.sp_InsertLog @SourceSystem = {sourceSystem},@UserId = {userId},@Description = {limitedMessage},@Action = {typeAction}");
+                await _db.Database.ExecuteSqlInterpolatedAsync($"EXEC dbo.InsertLog @SourceSystem = {sourceSystem},@UserId = {userId},@Description = {limitedMessage},@Action = {typeAction}");
             }
         }
     }

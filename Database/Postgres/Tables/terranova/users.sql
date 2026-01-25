@@ -1,0 +1,21 @@
+CREATE TABLE terranova.users (
+  id char(26) PRIMARY KEY,
+  first_name varchar(50) NOT NULL,
+  last_name varchar(50) NOT NULL,
+  phone_number varchar(20),
+  date_of_birth timestamptz,
+  gender char(1),
+  password_hash varchar(225),
+  salt varchar(225),
+  role_hash varchar(225),
+  is_active boolean,
+  created_at timestamptz,
+  update_at timestamptz,
+  country varchar(50),
+  city varchar(50),
+  state varchar(50),
+  address varchar(100),
+  postal_code varchar(20),
+  email_address varchar(50),
+  is_deleted boolean NOT NULL
+);

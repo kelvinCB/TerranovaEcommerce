@@ -15,7 +15,7 @@ CREATE TABLE dbo.Logs(
 -- Create stored procedure to insert logs
 USE Event;
 GO
-CREATE PROCEDURE dbo.sp_InsertLog
+CREATE PROCEDURE dbo.InsertLog
 	@SourceSystem NVARCHAR(50),
 	@UserId INT = NULL,
 	@Action NVARCHAR(100),
