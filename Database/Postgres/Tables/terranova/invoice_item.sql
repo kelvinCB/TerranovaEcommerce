@@ -2,7 +2,7 @@ CREATE TABLE terranova.invoice_item (
   id char(26) PRIMARY KEY,
   invoice_id char(26) NOT NULL,
   product_id char(26) NOT NULL,
-  quantity char(26) NOT NULL,
+  quantity integer,
   unit_price numeric(18, 2),
   created_at timestamptz,
   update_at timestamptz,
