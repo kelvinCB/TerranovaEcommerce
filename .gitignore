@@ -1,1 +1,75 @@
-node_modules
+###################################
+#        .NET (RECURSIVO)
+###################################
+
+# Build
+**/bin/
+**/obj/
+
+# Visual Studio
+**/.vs/
+*.user
+*.suo
+*.userprefs
+*.cache
+
+# Configuration
+**/appsettings.json
+**/appsettings.Development.json
+**/appsettings.*.json
+
+###################################
+#         REACT / NODE
+###################################
+
+# Node modules
+**/node_modules/
+
+# Build dist
+**/dist/
+**/build/
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+**/.env
+**/.env.*
+**/.env.local
+**/.env.development.local
+**/.env.production.local
+**/.env.test.local
+
+###################################
+#        GENERAL
+###################################
+
+# SO
+.DS_Store
+Thumbs.db
+
+# IDE / Tools
+**/.vscode/
+**/.idea/
+
+# Backup / Temporal
+*.tmp
+*.temp
+*.bak
+*.swp
+*.log
+
+# Dependent files lock
+# **/package-lock.json
+# **/yarn.lock
+
+###################################
+#       DATABASE (scripts)
+###################################
+
+# Ignore dumps
+*.sql.bak
+*.dump
+*.backup
