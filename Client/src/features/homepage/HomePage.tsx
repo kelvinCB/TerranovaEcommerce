@@ -1,4 +1,4 @@
-import { IoHeart, IoMusicalNotes, IoShirt, IoSparkles } from "react-icons/io5";
+import { IoMusicalNotes, IoShirt, IoSparkles } from "react-icons/io5";
 import BentoBlockLink from "@/components/ui/BentoBlockLink";
 import ProductSlider from "@/components/ui/ProductSlider";
 import PromoBanner from "@/components/ui/PromoBanner";
@@ -9,44 +9,21 @@ function HomePage() {
 
   return (
     <>
-      <div className="mb-0 flex w-full items-center justify-center lg:mb-8 lg:p-0">
-        <div className="flex w-full grid-cols-1 flex-col gap-10 sm:grid-rows-4 lg:grid lg:grid-cols-10 lg:[grid-template-rows:0.2fr_1fr]">
-          <PromoBanner
-            glassy={false}
-            headingText={
-              <>
-                New Phone, <span className="highlighted">New You.</span>
-              </>
-            }
-            description="Upgrade your style, power up your life. Discover the latest iPhone and
+      <div className="mb-12 flex w-full items-center justify-center lg:p-0">
+        <PromoBanner
+          glassy={false}
+          headingText={
+            <>
+              New Phone, <span className="highlighted">New You.</span>
+            </>
+          }
+          description="Upgrade your style, power up your life. Discover the latest iPhone and
           start fresh with tech that matches your ambition."
-            linkTo="/products/phones"
-            ctaText="Shop Now"
-            imgSrc="/hand-holding-iphone.png"
-            imgAlt="Hand holding an iPhone"
-          />
-
-          <BentoBlockLink
-            heading="Shop now, wear forever."
-            paragraph="Elevate your wardrobe with timeless styles that never go out of fashion. Shop now and enjoy pieces that last season after season."
-            className="hover:bg-secondary-600 bg-secondary-500 p-8 pb-0 lg:h-[10.4rem] lg:pb-8"
-            image="/woman-portrait.png"
-            imageAlt="Stylish woman with a flower in her mouth."
-            imageMargin="lg:mt-2"
-            rowSpan="lg:row-span-1"
-            imageClassName="w-64 lg:max-w-50"
-            linkTo="/products/clothing"
-          />
-
-          <div className="group mt-2 flex flex-col rounded-3xl lg:col-span-5 lg:row-span-1">
-            <ProductSlider
-              categoryName="/"
-              products={getProducts("wishlisted")}
-              headingText="Your Wishlist"
-              icon={<IoHeart className="text-red-500" />}
-            />
-          </div>
-        </div>
+          linkTo="/products/phones"
+          ctaText="Shop Now"
+          imgSrc="/hand-holding-iphone.png"
+          imgAlt="Hand holding an iPhone"
+        />
       </div>
       <div className="flex w-full flex-col gap-6 lg:p-0">
         <BentoBlockLink
