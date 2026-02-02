@@ -3,6 +3,7 @@ import ButtonWithIcon from "./ButtonWithIcon";
 import Heading from "./Heading";
 import Paragraph from "./Paragraph";
 import { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 interface PromoBannerProps {
   linkTo: string;
@@ -12,6 +13,7 @@ interface PromoBannerProps {
   ctaText: string;
   imgSrc: string;
   imgAlt: string;
+  className?: string;
 }
 
 function PromoBanner({
@@ -22,12 +24,17 @@ function PromoBanner({
   imgSrc,
   imgAlt,
   glassy = true,
+  className = "",
 }: PromoBannerProps) {
   return (
     <div
-      className={`relative flex flex-col p-8 px-0 pb-0 sm:row-span-8 lg:col-span-5 lg:row-span-2 lg:flex-row lg:overflow-hidden ${glassy ? "glass" : ""}`}
+      className={cn(
+        "group relative flex w-full flex-col items-center justify-center p-8 pb-0 lg:flex-row lg:overflow-hidden lg:px-12",
+        glassy ? "glass" : "",
+        className,
+      )}
     >
-      <div className="flex flex-col self-center pb-8">
+      <div className="z-20 flex flex-col items-center text-center lg:w-1/2 lg:items-start lg:text-left pb-8 lg:pb-0">
         <Heading margin="md" size="xxxxl" weight="bold">
           {headingText}
         </Heading>
@@ -38,12 +45,14 @@ function PromoBanner({
           {ctaText}
         </ButtonWithIcon>
       </div>
-      <img
-        draggable="false"
-        className="mx-auto max-h-[80vh] w-xs object-contain select-none lg:w-xs lg:self-auto"
-        src={imgSrc}
-        alt={imgAlt}
-      />
+      <div className="relative flex w-full items-center justify-center lg:w-1/2 [perspective:1000px]">
+        <img
+          draggable="false"
+          className="animate-float max-h-[60vh] w-full max-w-xs object-contain select-none transition-all duration-700 ease-out group-hover:scale-110 group-hover:rotate-y-12 group-hover:rotate-z-2 group-hover:brightness-110 lg:max-w-md"
+          src={imgSrc}
+          alt={imgAlt}
+        />
+      </div>
     </div>
   );
 }
