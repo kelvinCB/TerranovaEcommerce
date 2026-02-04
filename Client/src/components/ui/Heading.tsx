@@ -1,6 +1,6 @@
 import { VariantProps, cva } from "class-variance-authority";
 import { HTMLAttributes } from "react";
-import { cn } from "@/utils/utils";
+import { cn } from "@/lib/utils";
 
 const headingVariants = cva("", {
   variants: {
