@@ -7,9 +7,13 @@ CREATE TABLE terranova.refresh_tokens (
   revoked_at timestamptz,
   replaced_by_token_id char(26),
   created_at timestamptz NOT NULL DEFAULT now(),
-  user_agent varchar(200),
+  user_agent varchar(500),
   ip_address varchar(45)
 );
 
+-- Foreign Keys
 ALTER TABLE terranova.refresh_tokens ADD CONSTRAINT fk_refresh_tokens_user FOREIGN KEY (user_id) REFERENCES terranova.users(id);
 ALTER TABLE terranova.refresh_tokens ADD CONSTRAINT fk_refresh_tokens_replaced FOREIGN KEY (replaced_by_token_id) REFERENCES terranova.refresh_tokens(id);
+
+-- Checks and Uniques
+CREATE UNIQUE INDEX uq_refresh_tokens_jti ON terranova.refresh_tokens (jti) WHERE jti IS NOT NULL;

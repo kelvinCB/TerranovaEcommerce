@@ -3,6 +3,6 @@ CREATE TABLE terranova.payment_method (
   name varchar(50) NOT NULL UNIQUE,
   description varchar(255),
   created_at timestamptz NOT NULL DEFAULT NOW(),
-  updated_at timestamptz,
+  updated_at timestamptz NOT NULL DEFAULT NOW(),
   is_deleted boolean NOT NULL DEFAULT FALSE
 );

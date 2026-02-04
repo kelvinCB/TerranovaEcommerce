@@ -9,8 +9,8 @@ CREATE TABLE terranova.payment_webhook_log (
   status varchar(50) NOT NULL,
   error_message text,
   created_at timestamptz NOT NULL DEFAULT NOW(),
-  updated_at timestamptz,
-  is_deleted boolean NOT NULL DEFAULT FALSE
+  updated_at timestamptz NOT NULL DEFAULT NOW()
 );
 
+-- Foreign Keys
 ALTER TABLE terranova.payment_webhook_log ADD CONSTRAINT fk_payment_webhook_log_payment FOREIGN KEY (payment_id) REFERENCES terranova.payment (id);
