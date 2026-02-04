@@ -627,7 +627,7 @@ DROP TRIGGER IF EXISTS trg_wish_list_updated_at ON terranova.wish_list;
 CREATE TRIGGER trg_wish_list_updated_at BEFORE UPDATE ON terranova.wish_list FOR EACH ROW EXECUTE FUNCTION terranova.set_updated_at();
 
 -- wish_list_item
-DROP TRIGGER IF EXISTS trg_wish_list_item_updated_at ON terranova.wish_list_item
+DROP TRIGGER IF EXISTS trg_wish_list_item_updated_at ON terranova.wish_list_item;
 CREATE TRIGGER trg_wish_list_item_updated_at BEFORE UPDATE ON terranova.wish_list_item FOR EACH ROW EXECUTE FUNCTION terranova.set_updated_at();
 
 COMMIT;
