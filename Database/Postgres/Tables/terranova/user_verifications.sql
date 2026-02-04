@@ -8,4 +8,4 @@ CREATE TABLE terranova.user_verifications (
   created_at timestamptz NOT NULL DEFAULT now()
 );
 
-ALTER TABLE terranova.user_verifications ADD CONSTRAINT fk_user_verifications_user FOREIGN KEY (user_id) REFERENCES terranova.users(id)
+ALTER TABLE terranova.user_verifications ADD CONSTRAINT fk_user_verifications_user FOREIGN KEY (user_id) REFERENCES terranova.users(id);
