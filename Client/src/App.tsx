@@ -2,14 +2,15 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import AppLayout from "@/components/ui/AppLayout";
+import ErrorPage from "@/components/ui/ErrorPage";
+import Account from "@/features/account/Account";
+import Address from "@/features/address/Address";
+import Cart from "@/features/cart/Cart";
+import Category from "@/features/category/Category";
 import HomePage from "@/features/homepage/HomePage";
-import Account from "./features/account/Account";
-import Address from "./features/address/Address";
-import Cart from "./features/cart/Cart";
-import Product from "./features/product/Product";
-import ErrorPage from "./components/ui/ErrorPage";
-import Category from "./features/category/Category";
-import Wishlist from "./features/wishlist/Wishlist";
+import Product from "@/features/product/Product";
+import Wishlist from "@/features/wishlist/Wishlist";
+import { PATHS } from "@/routes/paths";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,17 +22,17 @@ const queryClient = new QueryClient({
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: PATHS.home,
     element: <AppLayout />,
     errorElement: <ErrorPage />,
     children: [
       { index: true, element: <HomePage /> },
-      { path: "account", element: <Account /> },
-      { path: "address", element: <Address /> },
-      { path: "cart", element: <Cart /> },
-      { path: "products/:category/:id", element: <Product /> },
-      { path: "products/:category", element: <Category /> },
-      { path: "wishlist", element: <Wishlist /> },
+      { path: PATHS.account.slice(1), element: <Account /> },
+      { path: PATHS.address.slice(1), element: <Address /> },
+      { path: PATHS.cart.slice(1), element: <Cart /> },
+      { path: PATHS.productDetails.slice(1), element: <Product /> },
+      { path: PATHS.productsByCategory.slice(1), element: <Category /> },
+      { path: PATHS.wishlist.slice(1), element: <Wishlist /> },
     ],
   },
 ]);
