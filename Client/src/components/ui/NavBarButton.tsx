@@ -1,6 +1,6 @@
 import { cva, VariantProps } from "class-variance-authority";
 import { cloneElement, HTMLAttributes, ReactElement } from "react";
-import { cn } from "@/utils/utils";
+import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 
 const navBarButtonVariants = cva(
