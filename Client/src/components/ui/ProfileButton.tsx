@@ -6,19 +6,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { PATHS } from "@/routes/paths";
 import { IoLogOutOutline } from "react-icons/io5";
 import { Link } from "react-router-dom";
 
 const links = [
   {
     name: "My Account",
-    to: "/account",
+    to: PATHS.account,
   },
   {
     name: "My Address",
-    to: "/address",
+    to: PATHS.address,
   },
-];
+] as const;
 
 function ProfileButton() {
   return (
@@ -43,12 +44,11 @@ function ProfileButton() {
           <DropdownMenuSeparator className="bg-brand-100" />
           {links.map((link) => (
             <DropdownMenuItem
+              key={link.to}
               asChild
               className="hover:bg-brand-50 text-md cursor-pointer p-3 pl-2"
             >
-              <Link key={link.to} to={link.to}>
-                {link.name}
-              </Link>
+              <Link to={link.to}>{link.name}</Link>
             </DropdownMenuItem>
           ))}
           <DropdownMenuSeparator className="bg-brand-100" />
@@ -58,7 +58,7 @@ function ProfileButton() {
           >
             <Link
               className="text-red-500 group-hover:!text-red-600 hover:!text-red-600"
-              to="/"
+              to={PATHS.home}
             >
               <IoLogOutOutline
                 className="text-red-500 group-hover:!text-red-600"
