@@ -24,6 +24,7 @@ function CardItem({ item }: CardItemProps) {
   return (
     <div className="xxs:max-w-32 xs:max-w-35 xsm:max-w-44 xmd:max-w-46 relative max-w-30">
       <button
+        type="button"
         aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
         className="text-brand-50 absolute top-2 right-2 cursor-pointer rounded-full bg-red-500 p-2 hover:bg-red-700"
         onClick={() => setIsWishlisted((wishlisted) => !wishlisted)}

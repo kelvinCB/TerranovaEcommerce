@@ -31,9 +31,17 @@ interface BtnProps
   children: ReactNode;
 }
 
-function Btn({ className, children, variant, size, ...props }: BtnProps) {
+function Btn({
+  className,
+  children,
+  variant,
+  size,
+  type = "button",
+  ...props
+}: BtnProps) {
   return (
     <button
+      type={type}
       className={cn(buttonVariants({ variant, size }), className)}
       {...props}
     >
