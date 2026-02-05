@@ -27,6 +27,7 @@ function OrderSummary({ activeStep, handleActiveStep }: OrderSummaryProps) {
       </div>
 
       <button
+        type="button"
         onClick={() =>
           handleActiveStep((step) => {
             return activeStep !== 2 ? activeStep + 1 : step;
