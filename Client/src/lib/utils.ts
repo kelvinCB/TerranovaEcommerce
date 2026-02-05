@@ -15,7 +15,7 @@ export function getProducts(category: string | undefined) {
   if (category === undefined) return [];
   if (category === "all-products") return products;
   if (category === "wishlisted")
-    return products.filter((product) => product.isWishlisted && product);
+    return products.filter((product) => product.isWishlisted);
 
   return products.filter((product) => product.category === category);
 }
