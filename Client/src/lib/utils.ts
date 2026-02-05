@@ -48,6 +48,6 @@ export function getSortedProducts(products: Product[], sortType: string) {
     case "price-desc":
       return sorted.sort((a, b) => b.price - a.price);
     default:
-      return products;
+      return sorted;
   }
 }
