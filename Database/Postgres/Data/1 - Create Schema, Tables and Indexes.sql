@@ -489,7 +489,8 @@ ALTER TABLE terranova.order_item ADD CONSTRAINT chk_order_item_unit_price_positi
 ALTER TABLE terranova.payment DROP CONSTRAINT IF EXISTS chk_payment_amount_positive;
 ALTER TABLE terranova.payment ADD CONSTRAINT chk_payment_amount_positive CHECK (amount >= 0);
 
-CREATE UNIQUE INDEX CONCURRENTLY IF NOT EXISTS uq_payment_transaction_reference ON terranova.payment (transaction_reference) WHERE transaction_reference IS NOT NULL;
+-- NOTE: Cannot use CONCURRENTLY inside a transaction block (this script wraps everything in BEGIN/COMMIT).
+CREATE UNIQUE INDEX IF NOT EXISTS uq_payment_transaction_reference ON terranova.payment (transaction_reference) WHERE transaction_reference IS NOT NULL;
 
 -- product
 ALTER TABLE terranova.product DROP CONSTRAINT IF EXISTS chk_product_price_positive;
