@@ -5,12 +5,14 @@ import { cn } from "@/lib/utils";
 interface ButtonWithIconProps extends Omit<LinkProps, "to"> {
   icon: ReactElement<{ size?: number; className?: string }>;
   size?: number;
+  iconClassName?: string;
   to: LinkProps["to"];
 }
 
 function ButtonWithIcon({
   icon,
   size = 50,
+  iconClassName,
   className,
   to,
   children,
@@ -26,7 +28,10 @@ function ButtonWithIcon({
       {...props}
     >
       {children}
-      {cloneElement(icon, { size })}
+      {cloneElement(icon, {
+        size,
+        className: cn(icon.props.className, iconClassName),
+      })}
     </Link>
   );
 }
