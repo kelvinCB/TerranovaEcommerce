@@ -4,6 +4,7 @@ import {
   getProducts,
   getSortedProducts,
   replaceDashesWithSpaces,
+  type ProductSortType,
 } from "@/lib/utils";
 import { useParams } from "react-router-dom";
 import CategorySidebar from "./CategorySidebar";
@@ -13,9 +14,9 @@ import { useState } from "react";
 
 function Category() {
   const { category } = useParams();
-  const [sort, setSort] = useState("default");
+  const [sort, setSort] = useState<ProductSortType>("default");
 
-  function handleSetSort(sortType: string) {
+  function handleSetSort(sortType: ProductSortType) {
     setSort(sortType);
   }
 
