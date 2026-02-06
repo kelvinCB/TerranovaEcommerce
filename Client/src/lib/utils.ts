@@ -39,7 +39,9 @@ export function truncateName(name: string, maxLength: number = 20): string {
     : name;
 }
 
-export function getSortedProducts(products: Product[], sortType: string) {
+export type ProductSortType = "default" | "price-asc" | "price-desc";
+
+export function getSortedProducts(products: Product[], sortType: ProductSortType) {
   const sorted = [...products];
 
   switch (sortType) {
@@ -47,6 +49,7 @@ export function getSortedProducts(products: Product[], sortType: string) {
       return sorted.sort((a, b) => a.price - b.price);
     case "price-desc":
       return sorted.sort((a, b) => b.price - a.price);
+    case "default":
     default:
       return sorted;
   }
