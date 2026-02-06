@@ -1,9 +1,11 @@
+import type { ProductSortType } from "@/lib/utils";
+
 interface SortProps {
-  sort: string;
-  handleSetSort: (sortType: string) => void;
+  sort: ProductSortType;
+  handleSetSort: (sortType: ProductSortType) => void;
 }
 
-const sortTypes = [
+const sortTypes: Array<{ name: string; value: ProductSortType }> = [
   { name: "Default", value: "default" },
   { name: "Price: Lowest First", value: "price-asc" },
   { name: "Price: Highest First", value: "price-desc" },
@@ -15,7 +17,7 @@ function Sort({ sort, handleSetSort }: SortProps) {
       <span className="mr-2">Sort by:</span>
       <select
         value={sort}
-        onChange={(e) => handleSetSort(e.target.value)}
+        onChange={(e) => handleSetSort(e.target.value as ProductSortType)}
         className="p-2 pl-0 font-bold"
       >
         {sortTypes.map((sort) => (
