@@ -1,5 +1,11 @@
 # React + TypeScript + Vite
 
+## Quickstart
+
+- Client: `pnpm -C Client install && pnpm -C Client dev`
+- Backend/API: see `Server/` (if applicable)
+
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
