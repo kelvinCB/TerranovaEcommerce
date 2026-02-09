@@ -49,10 +49,6 @@ TerranovaEcommerce/
    pnpm -C Client build
    ```
 
-## 🤖 Automation
-
-This project uses **Etiven**, an AI-powered automation bot, to maintain code quality and standards.
-
 ## 📄 License
 
 MIT
