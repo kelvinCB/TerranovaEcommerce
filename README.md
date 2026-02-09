@@ -1,60 +1,58 @@
-# React + TypeScript + Vite
+# TerranovaEcommerce
 
-## Quickstart
+A modern e-commerce platform built with React, TypeScript, and Vite.
 
-- Client: `pnpm -C Client install && pnpm -C Client dev`
-- Backend/API: see `Server/` (if applicable)
+## 🚀 Technologies
 
+- **Frontend**: React 19, Vite 6, Tailwind CSS 4
+- **State Management**: TanStack Query (React Query)
+- **Routing**: React Router
+- **UI Components**: Radix UI, Lucide Icons
+- **Tooling**: ESLint, Prettier, pnpm
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 📁 Project Structure
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```text
+TerranovaEcommerce/
+├── Client/              # Frontend application
+│   ├── src/
+│   │   ├── app/         # App-wide providers and configuration
+│   │   ├── components/  # Shared components (including shadcn/ui)
+│   │   ├── features/    # Domain-driven features
+│   │   ├── routes/      # Routing logic and paths
+│   │   └── lib/         # External library configurations
+├── docs/                # Documentation
+└── memory/              # Automation and state tracking
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🛠️ Development
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Prerequisites
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+- [Node.js](https://nodejs.org/) (v20+)
+- [pnpm](https://pnpm.io/)
+
+### Quickstart
+
+1. Install dependencies:
+   ```bash
+   pnpm -C Client install
+   ```
+
+2. Start the development server:
+   ```bash
+   pnpm -C Client dev
+   ```
+
+3. Build for production:
+   ```bash
+   pnpm -C Client build
+   ```
+
+## 🤖 Automation
+
+This project uses **Etiven**, an AI-powered automation bot, to maintain code quality and standards.
+
+## 📄 License
+
+MIT
