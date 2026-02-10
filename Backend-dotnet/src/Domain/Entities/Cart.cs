@@ -4,22 +4,23 @@ namespace Domain.Entities
     {
         public Ulid Id { get; private set; }
         public Ulid UserId { get; private set; }
-        public DateTimeOffset CreateAt { get; private set; }
-        public DateTimeOffset UpdateAt { get; private set; }
+        public DateTimeOffset CreatedAt { get; private set; }
+        public DateTimeOffset UpdatedAt { get; private set; }
 
-        public Cart(Ulid userId)
+        public Cart(Ulid id, Ulid userId, DateTimeOffset utcNow)
         {
-            if(userId == Ulid.Empty) throw new ArgumentException("User Id is required.", nameof(userId));
+            if (id == Ulid.Empty) throw new ArgumentException("Id is required.", nameof(id));
+            if (userId == Ulid.Empty) throw new ArgumentException("User Id is required.", nameof(userId));
 
-            Id = Ulid.NewUlid();
+            Id = id;
             UserId = userId;
-            CreateAt = DateTimeOffset.UtcNow;
-            UpdateAt = DateTimeOffset.UtcNow;
+            CreatedAt = utcNow;
+            UpdatedAt = utcNow;
         }
 
-        public void UpdateCart()
+        public void UpdateCart(DateTimeOffset utcNow)
         {
-            UpdateAt = DateTimeOffset.UtcNow;
+            UpdatedAt = utcNow;
         }
     }
 }
