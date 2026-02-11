@@ -7,23 +7,35 @@ namespace Domain.Entities
         public DateTimeOffset CreatedAt { get; private set; }
         public DateTimeOffset UpdatedAt { get; private set; }
 
-        public Cart(Ulid id, Ulid userId, DateTimeOffset utcNow)
+        public Cart(Ulid id, Ulid userId, DateTimeOffset timestamp)
         {
             if (id == Ulid.Empty) throw new ArgumentException("Id is required.", nameof(id));
             if (userId == Ulid.Empty) throw new ArgumentException("User Id is required.", nameof(userId));
-            if (utcNow.Offset != TimeSpan.Zero) throw new ArgumentException("CreatedAt must be in UTC.", nameof(utcNow));
+
+            EnsureUtc(timestamp);
 
             Id = id;
             UserId = userId;
-            CreatedAt = utcNow;
-            UpdatedAt = utcNow;
+            CreatedAt = timestamp;
+            UpdatedAt = timestamp;
         }
 
-        public void UpdateCart(DateTimeOffset utcNow)
+        public void UpdateCart(DateTimeOffset timestamp)
         {
-            if (utcNow.Offset != TimeSpan.Zero) throw new ArgumentException("UpdatedAt must be in UTC.", nameof(utcNow));
+            EnsureUtc(timestamp);
 
-            UpdatedAt = utcNow;
+            UpdatedAt = timestamp;
+        }
+
+        private static void EnsureUtc(DateTimeOffset value)
+        {
+            // Validate that the value is not null
+            if (value == default) 
+                throw new ArgumentException("Timestamp is required.", nameof(value));
+
+            // Validate that the value is in UTC
+            if (value.Offset != TimeSpan.Zero)
+                throw new ArgumentException("Timestamp must be in UTC (offset 00:00).", nameof(value));
         }
     }
 }

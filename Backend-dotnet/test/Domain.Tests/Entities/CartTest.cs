@@ -10,18 +10,18 @@ namespace Domain.Test.Entities
             // Arrange
             var id = Ulid.NewUlid();
             var userId = Ulid.NewUlid();
-            var utcNow = DateTimeOffset.UtcNow;
+            var timestamp = DateTimeOffset.UtcNow;
 
             // Act
-            var cart = new Cart(id, userId, utcNow);
+            var cart = new Cart(id, userId, timestamp);
 
             // Assert
             Assert.NotNull(cart);
             Assert.Equal(id, cart.Id);
             Assert.Equal(userId, cart.UserId);
             Assert.NotEqual(Ulid.Empty, cart.Id);
-            Assert.Equal(utcNow, cart.CreatedAt);
-            Assert.Equal(utcNow, cart.UpdatedAt);
+            Assert.Equal(timestamp, cart.CreatedAt);
+            Assert.Equal(timestamp, cart.UpdatedAt);
             Assert.True(cart.CreatedAt <= DateTimeOffset.UtcNow);
             Assert.True(cart.UpdatedAt <= DateTimeOffset.UtcNow);
         }
@@ -31,10 +31,10 @@ namespace Domain.Test.Entities
             // Arrange
             var id = Ulid.Empty;
             var userId = Ulid.NewUlid();
-            var utcNow = DateTimeOffset.UtcNow;
+            var timestamp = DateTimeOffset.UtcNow;
 
             // Act and Assert
-            var exception = Assert.Throws<ArgumentException>(() => new Cart(id, userId, utcNow));
+            var exception = Assert.Throws<ArgumentException>(() => new Cart(id, userId, timestamp));
             Assert.Contains("Id is required.", exception.Message);
         }
 
@@ -44,10 +44,10 @@ namespace Domain.Test.Entities
             // Arrange
             var id = Ulid.NewUlid();
             var userId = Ulid.Empty;
-            var utcNow = DateTimeOffset.UtcNow;
+            var timestamp = DateTimeOffset.UtcNow;
 
             // Act and Assert
-            var exception = Assert.Throws<ArgumentException>(() => new Cart(id, userId, utcNow));
+            var exception = Assert.Throws<ArgumentException>(() => new Cart(id, userId, timestamp));
             Assert.Contains("User Id is required.", exception.Message);
         }
 
@@ -57,11 +57,11 @@ namespace Domain.Test.Entities
             // Arrange
             var id = Ulid.NewUlid();
             var userId = Ulid.NewUlid();
-            var localNow = DateTimeOffset.Now;
+            var timestamp = DateTimeOffset.Now;
 
             // Act and Assert
-            var exception = Assert.Throws<ArgumentException>(() => new Cart(id, userId, localNow));
-            Assert.Contains("CreatedAt must be in UTC.", exception.Message);
+            var exception = Assert.Throws<ArgumentException>(() => new Cart(id, userId, timestamp));
+            Assert.Contains("Timestamp must be in UTC (offset 00:00).", exception.Message);
         }
 
         [Fact]
@@ -70,12 +70,12 @@ namespace Domain.Test.Entities
             // Arrange
             var id = Ulid.NewUlid();
             var userId = Ulid.NewUlid();
-            var utcNow = DateTimeOffset.UtcNow;
-            var cart = new Cart(id, userId, utcNow);
+            var timestamp = DateTimeOffset.UtcNow;
+            var cart = new Cart(id, userId, timestamp);
             var originalUpdatedAt = cart.UpdatedAt;
 
             // Act
-            cart.UpdateCart(utcNow.AddMinutes(1));
+            cart.UpdateCart(timestamp.AddMinutes(1));
             // Assert
             Assert.True(cart.UpdatedAt > originalUpdatedAt);
         }
