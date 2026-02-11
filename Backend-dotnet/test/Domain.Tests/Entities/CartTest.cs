@@ -52,19 +52,32 @@ namespace Domain.Test.Entities
         }
 
         [Fact]
-        public void UpdateCart_ShouldUpdatePropertyUpdateAt()
+        public void CreateCart_ShouldThrowException_WhenCreatedAtIsNotUtc()
+        {
+            // Arrange
+            var id = Ulid.NewUlid();
+            var userId = Ulid.NewUlid();
+            var localNow = DateTimeOffset.Now;
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => new Cart(id, userId, localNow));
+            Assert.Contains("CreatedAt must be in UTC.", exception.Message);
+        }
+
+        [Fact]
+        public void UpdateCart_ShouldUpdatePropertyUpdatedAt()
         {
             // Arrange
             var id = Ulid.NewUlid();
             var userId = Ulid.NewUlid();
             var utcNow = DateTimeOffset.UtcNow;
             var cart = new Cart(id, userId, utcNow);
-            var originalUpdateAt = cart.UpdatedAt;
+            var originalUpdatedAt = cart.UpdatedAt;
 
             // Act
             cart.UpdateCart(utcNow.AddMinutes(1));
             // Assert
-            Assert.True(cart.UpdatedAt > originalUpdateAt);
+            Assert.True(cart.UpdatedAt > originalUpdatedAt);
         }
     }
 }
