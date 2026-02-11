@@ -11,6 +11,7 @@ namespace Domain.Entities
         {
             if (id == Ulid.Empty) throw new ArgumentException("Id is required.", nameof(id));
             if (userId == Ulid.Empty) throw new ArgumentException("User Id is required.", nameof(userId));
+            if (utcNow.Offset != TimeSpan.Zero) throw new ArgumentException("CreatedAt must be in UTC.", nameof(utcNow));
 
             Id = id;
             UserId = userId;
@@ -20,6 +21,8 @@ namespace Domain.Entities
 
         public void UpdateCart(DateTimeOffset utcNow)
         {
+            if (utcNow.Offset != TimeSpan.Zero) throw new ArgumentException("UpdatedAt must be in UTC.", nameof(utcNow));
+
             UpdatedAt = utcNow;
         }
     }
