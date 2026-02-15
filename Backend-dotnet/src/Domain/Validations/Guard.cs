@@ -6,8 +6,8 @@ namespace Domain.Validations
     public static void EnsureUtc(DateTimeOffset value, string propertyName)
     {
       // Validate that the value is not null
-      if (value == default) 
-        throw new ArgumentException("Timestamp is required.", propertyName);
+      if (IsUninitialized(value)) 
+        throw new ArgumentException("Timestamp is uninitialized.", propertyName);
 
       // Validate that the value is in UTC
       if (value.Offset != TimeSpan.Zero)
@@ -19,17 +19,25 @@ namespace Domain.Validations
     {
       if (string.IsNullOrWhiteSpace(value))
       {
-        throw new ArgumentException($"The property '{propertyName}' cannot be null or whitespace.");
+        throw new ArgumentException($"The property '{propertyName}' cannot be null or whitespace.", propertyName);
       }
     }
 
-    // Creck if the char value is empty and throw an exception if it is
-    public static void EnsureCharNotEmpty(char value, string propertyName)
+    // Check if the char value is empty and throw an exception if it is
+    public static void EnsureCharInitializedAndNotWhiteSpace(char value, string propertyName)
     {
       if (char.IsWhiteSpace(value))
       {
-        throw new ArgumentException($"The property '{propertyName}' cannot be empty.");
+        throw new ArgumentException($"The property '{propertyName}' cannot be whitespace.", propertyName);
+      }
+
+      if (IsUninitialized(value))
+      {
+        throw new ArgumentException($"The property '{propertyName}' is uninitialized.", propertyName);
       }
     }
+
+    // Check if the value is default and throw false if it is
+    private static bool IsUninitialized<T>(T value) => EqualityComparer<T>.Default.Equals(value, default);
   }
 }

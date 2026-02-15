@@ -105,7 +105,7 @@ namespace Domain.Test.Entities
 
             // Act and Assert
             var exception = Assert.Throws<ArgumentException>(() => cart.UpdateCart(default));
-            Assert.Contains("Timestamp is required.", exception.Message);
+            Assert.Contains("Timestamp is uninitialized.", exception.Message);
         }
 
         [Fact]
