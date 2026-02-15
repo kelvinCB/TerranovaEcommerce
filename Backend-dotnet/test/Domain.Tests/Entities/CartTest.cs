@@ -118,7 +118,7 @@ namespace Domain.Test.Entities
             var cart = new Cart(id, userId, timestamp);
 
             // Act and Assert
-            var exception = Assert.Throws<ArgumentException>(() => cart.UpdateCart(DateTime.Now));
+            var exception = Assert.Throws<ArgumentException>(() => cart.UpdateCart(DateTimeOffset.Now));
             Assert.Contains("Timestamp must be in UTC (offset 00:00).", exception.Message);
         }
     }
