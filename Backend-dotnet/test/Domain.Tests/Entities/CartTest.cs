@@ -79,5 +79,47 @@ namespace Domain.Test.Entities
             // Assert
             Assert.True(cart.UpdatedAt > originalUpdatedAt);
         }
+
+        [Fact]
+        public void UpdateCart_ShouldThrowException_WhenUpdatedAtIsBeforeCreatedAt()
+        {
+            // Arrange
+            var id = Ulid.NewUlid();
+            var userId = Ulid.NewUlid();
+            var timestamp = DateTimeOffset.UtcNow;
+            var cart = new Cart(id, userId, timestamp);
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => cart.UpdateCart(timestamp.AddMinutes(-1)));
+            Assert.Contains("UpdatedAt cannot be before CreatedAt.", exception.Message);
+        }
+
+        [Fact]
+        public void UpdateCart_ShouldThrowException_WhenUpdatedAtIsDefault()
+        {
+            // Arrange
+            var id = Ulid.NewUlid();
+            var userId = Ulid.NewUlid();
+            var timestamp = DateTimeOffset.UtcNow;
+            var cart = new Cart(id, userId, timestamp);
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => cart.UpdateCart(default));
+            Assert.Contains("Timestamp is required.", exception.Message);
+        }
+
+        [Fact]
+        public void UpdateCart_ShouldThrowException_WhenUpdatedAtIsNotUtc()
+        {
+            // Arrange
+            var id = Ulid.NewUlid();
+            var userId = Ulid.NewUlid();
+            var timestamp = DateTimeOffset.UtcNow;
+            var cart = new Cart(id, userId, timestamp);
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => cart.UpdateCart(DateTime.Now));
+            Assert.Contains("Timestamp must be in UTC (offset 00:00).", exception.Message);
+        }
     }
 }
