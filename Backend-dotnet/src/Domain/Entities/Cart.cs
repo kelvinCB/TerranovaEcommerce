@@ -26,6 +26,9 @@ namespace Domain.Entities
         {
             Guard.EnsureUtc(timestamp, nameof(timestamp));
 
+            if (CreatedAt == default)
+                throw new InvalidOperationException("CreatedAt must be set before updating the cart.");
+
             if (timestamp < CreatedAt)
                 throw new ArgumentException("UpdatedAt cannot be before CreatedAt.", nameof(timestamp));
 
