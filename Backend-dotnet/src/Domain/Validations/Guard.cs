@@ -1,8 +1,18 @@
 namespace Domain.Validations
 {
+  /// <summary>
+  /// Provides guard clauses for validating method arguments and properties.
+  /// </summary>
   public static class Guard
   {
-    // Check if Timestamp is not null and is in UTC format, throw an exception if it is not
+    /// <summary>
+    /// Ensures that a DateTimeOffset value is initialized and in UTC format.
+    /// </summary>
+    /// <param name="value">The DateTimeOffset value to validate.</param>
+    /// <param name="propertyName">The name of the property being validated.</param>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the value is uninitialized or not in UTC format.
+    /// </exception>
     public static void EnsureUtc(DateTimeOffset value, string propertyName)
     {
       if (IsUninitialized(value))
@@ -12,7 +22,14 @@ namespace Domain.Validations
         throw new ArgumentException("Timestamp must be in UTC (offset 00:00).", propertyName);
     }
 
-    // Check if the string value is null or whitespace and throw an exception if it is
+    /// <summary>
+    /// Ensures that a string value is not null, empty, or consists only of whitespace characters.
+    /// </summary>
+    /// <param name="value">The string value to validate.</param>
+    /// <param name="propertyName">The name of the property being validated.</param>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the value is null, empty, or consists only of whitespace characters.
+    /// </exception>
     public static void EnsureStringNotNullOrWhiteSpace(string value, string propertyName)
     {
       if (string.IsNullOrWhiteSpace(value))
@@ -21,7 +38,14 @@ namespace Domain.Validations
       }
     }
 
-    // Check if the char value is uninitialized or it has whitespace and throw an exception if it is
+    /// <summary>
+    /// Ensures that a char value is initialized and not a whitespace character.
+    /// </summary>
+    /// <param name="value">The char value to validate.</param>
+    /// <param name="propertyName">The name of the property being validated.</param>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the value is uninitialized or is a whitespace character.
+    /// </exception>
     public static void EnsureCharInitializedAndNotWhiteSpace(char value, string propertyName)
     {
       if (IsUninitialized(value))
