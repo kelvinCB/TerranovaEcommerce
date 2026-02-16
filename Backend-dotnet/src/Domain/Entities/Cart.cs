@@ -2,6 +2,11 @@ using Domain.Validations;
 
 namespace Domain.Entities
 {
+    /// <summary>
+    /// Represents a shopping cart associated with a user.
+    /// Each cart has a unique identifier, a reference to the user it belongs to,
+    /// and timestamps for when it was created and last updated.
+    /// </summary>
     public class Cart
     {
         public Ulid Id { get; private set; }
@@ -9,6 +14,13 @@ namespace Domain.Entities
         public DateTimeOffset CreatedAt { get; private set; }
         public DateTimeOffset UpdatedAt { get; private set; }
 
+        /// <summary>
+        /// Initializes a new instance of the Cart class with the specified parameters.
+        /// </summary>
+        /// <param name="id">The cart identifier.</param>
+        /// <param name="userId">The user identifier.</param>
+        /// <param name="timestamp">The timestamp for when the cart was created.</param>
+        /// <exception cref="ArgumentException">Thrown when the id or userId is empty, or when the timestamp is not in UTC.</exception>
         public Cart(Ulid id, Ulid userId, DateTimeOffset timestamp)
         {
             if (id == Ulid.Empty) throw new ArgumentException("Id is required.", nameof(id));
@@ -22,6 +34,13 @@ namespace Domain.Entities
             UpdatedAt = timestamp;
         }
 
+        /// <summary>
+        /// Updates the cart's UpdatedAt timestamp. 
+        /// The new timestamp must be in UTC and cannot be before the <see cref="CreatedAt"/> timestamp.
+        /// </summary>
+        /// <param name="timestamp">The new timestamp for updating the cart.</param>
+        /// <exception cref="InvalidOperationException">Thrown when the cart's CreatedAt timestamp is not set.</exception>
+        /// <exception cref="ArgumentException">Thrown when the new timestamp is before the CreatedAt timestamp.</exception>
         public void UpdateCart(DateTimeOffset timestamp)
         {
             Guard.EnsureUtc(timestamp, nameof(timestamp));
