@@ -6,29 +6,34 @@ namespace Domain.ValueObjects
   /// </summary>
   public sealed record PasswordHash
   {
+    private const int MinimumLength = 65;
+
     /// <summary>
     /// Gets the password hash value. The value is guaranteed to be a non-empty string.
     /// </summary>
-    public string Value { get;}
+    public string Value { get; }
 
     /// <summary>
     /// Initializes a new instance of the PasswordHash class with the specified password hash value,
     /// validating that it is a non-empty string.
     /// </summary>
-    /// <param name="value">The password hash value to be stored.</param>
-    /// <exception cref="ArgumentException">Thrown when the password hash is null or empty.</exception>
+    /// <param name="hash">The password hash value to be stored.</param>
+    /// <exception cref="ArgumentException">Thrown when the provided hash value is null, empty, or contains only whitespace.</exception>
+    /// <exception cref="ArgumentException">Thrown when the provided hash value is not longer than 64 characters.</exception>
+    /// <exception cref="ArgumentException">Thrown when the provided hash value contains whitespace characters.</exception>
     private PasswordHash(string hash)
     {
       if (string.IsNullOrWhiteSpace(hash))
-       throw new ArgumentException("Password hash is required.", nameof(hash));
+        throw new ArgumentException("Password hash is required.", nameof(hash));
 
       hash = hash.Trim();
 
-      if (hash.Length <= 64)
-        throw new ArgumentException("Password hash must be longer than 64 characters.", nameof(hash));
+      if (hash.Length < MinimumLength)
+        throw new ArgumentException($"Password hash must be longer than {MinimumLength} characters.", nameof(hash));
 
       for (int i = 0; i < hash.Length; i++)
       {
+        // Check for whitespace characters in the hash value ej. "test @test.com"
         if (char.IsWhiteSpace(hash[i]))
           throw new ArgumentException("Password hash cannot contain whitespace characters.", nameof(hash));
       }
@@ -37,9 +42,9 @@ namespace Domain.ValueObjects
     }
 
     /// <summary>
-    /// Creates a new PasswordHash value object from the provided string value,
+    /// Creates a new PasswordHash value object from the provided string value.
     /// </summary>
-    /// <param name="value">The password hash value to be created.</param>
+    /// <param name="hash">The password hash value to be created.</param>
     /// <returns>A new PasswordHash value object.</returns>
     public static PasswordHash From(string hash) => new PasswordHash(hash);
 
