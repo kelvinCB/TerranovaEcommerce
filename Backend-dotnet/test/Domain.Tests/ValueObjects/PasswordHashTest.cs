@@ -4,12 +4,13 @@ namespace Domain.Tests.ValueObjects
 {
     public class PasswordHashTest
     {
+        private const int MinimumPasswordHashLength = 64;
+
         [Fact]
         public void PasswordHash_ShouldCreatePasswordHash_WhenValueIsValid()
         {
             // Arrange
-            const int validLength = 65;
-            var validPasswordHash = "a".PadLeft(validLength, 'a'); // Create a string of 65 characters
+            var validPasswordHash = "a".PadLeft(MinimumPasswordHashLength, 'a'); // Create a string of 64 characters
 
             // Act
             var passwordHash = PasswordHash.From(validPasswordHash);
@@ -22,7 +23,7 @@ namespace Domain.Tests.ValueObjects
         public void PasswordHash_ShouldThrowException_WhenValueIsNull()
         {
             // Arrange
-            string? passwordHash = null;
+            string? passwordHash = default;
 
             // Act & Assert
             var exception = Assert.Throws<ArgumentException>(() => PasswordHash.From(passwordHash!)); // Force non-nullable string
@@ -30,22 +31,21 @@ namespace Domain.Tests.ValueObjects
         }
 
         [Fact]
-        public void PasswordHash_ShouldThrowException_WhenValueIsNotLongerThan64Characters()
+        public void PasswordHash_ShouldThrowException_WhenValueIsNotLongerThan63Characters()
         {
             // Arrange
-            var shortPasswordHash = "a";
+            var shortPasswordHash = "a".PadLeft(MinimumPasswordHashLength - 1, 'a'); // Create a string of 63 characters
 
             // Act & Assert
             var exception = Assert.Throws<ArgumentException>(() => PasswordHash.From(shortPasswordHash));
-            Assert.Contains("must be longer", exception.Message, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("must be at least", exception.Message, StringComparison.OrdinalIgnoreCase);
         }
 
         [Fact]
         public void PasswordHash_ShouldThrowException_WhenValueHasWhitespace()
         {
             // Arrange
-            const int validLength = 65;
-            var whitespacePasswordHash = "a a".PadLeft(validLength, 'a'); // Create a string of 65 characters with whitespace
+            var whitespacePasswordHash = "a a".PadLeft(MinimumPasswordHashLength, 'a'); // Create a string of 64 characters with whitespace
 
             // Act & Assert
             var exception = Assert.Throws<ArgumentException>(() => PasswordHash.From(whitespacePasswordHash));
@@ -56,8 +56,7 @@ namespace Domain.Tests.ValueObjects
         public void PasswordHash_ToString_ShouldReturnMaskedValue()
         {
             // Arrange
-            const int validLength = 65;
-            var validPasswordHash = "a".PadLeft(validLength, 'a'); // Create a string of 65 characters
+            var validPasswordHash = "a".PadLeft(MinimumPasswordHashLength, 'a'); // Create a string of 64 characters
             var passwordHash = PasswordHash.From(validPasswordHash);
 
             // Act
