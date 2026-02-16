@@ -6,7 +6,10 @@ namespace Domain.ValueObjects
   /// </summary>
   public sealed record PasswordHash
   {
-    private const int MinimumLength = 65;
+    /// <summary>
+    /// Defines the minimum length requirement for a valid password hash, which must be longer than 63 characters.
+    /// </summary>
+    private const int MinimumPasswordHashLength = 64;
 
     /// <summary>
     /// Gets the password hash value. The value is guaranteed to be a non-empty string.
@@ -19,7 +22,7 @@ namespace Domain.ValueObjects
     /// </summary>
     /// <param name="hash">The password hash value to be stored.</param>
     /// <exception cref="ArgumentException">Thrown when the provided hash value is null, empty, or contains only whitespace.</exception>
-    /// <exception cref="ArgumentException">Thrown when the provided hash value is not longer than 64 characters.</exception>
+    /// <exception cref="ArgumentException">Thrown when the provided hash value is not longer than 63 characters.</exception>
     /// <exception cref="ArgumentException">Thrown when the provided hash value contains whitespace characters.</exception>
     private PasswordHash(string hash)
     {
@@ -28,15 +31,10 @@ namespace Domain.ValueObjects
 
       hash = hash.Trim();
 
-      if (hash.Length < MinimumLength)
-        throw new ArgumentException($"Password hash must be longer than {MinimumLength} characters.", nameof(hash));
+      if (hash.Length < MinimumPasswordHashLength)
+        throw new ArgumentException($"Password hash must be at least {MinimumPasswordHashLength} characters.", nameof(hash));
 
-      for (int i = 0; i < hash.Length; i++)
-      {
-        // Check for whitespace characters in the hash value ej. "test @test.com"
-        if (char.IsWhiteSpace(hash[i]))
-          throw new ArgumentException("Password hash cannot contain whitespace characters.", nameof(hash));
-      }
+      EnsurePasswordHashNotContainsWhitespace(hash);
       
       Value = hash;
     }
@@ -54,5 +52,20 @@ namespace Domain.ValueObjects
     /// </summary>
     /// <returns>A masked string representation of the password hash.</returns>
     public override string ToString() => "PasswordHash(***)";
+
+    /// <summary>
+    /// Validates that the provided password hash value does not contain any whitespace characters.
+    /// </summary>
+    /// <param name="hash">The password hash value to be validated.</param>
+    /// <exception cref="ArgumentException">Thrown when the provided hash value contains whitespace characters.</exception>
+    /// <example>"p@ssTest 123 4" is an example of a password hash that contains whitespace and would be considered invalid.</example>
+    private static void EnsurePasswordHashNotContainsWhitespace(string hash)
+    {
+      for (int i = 0; i < hash.Length; i++)
+      {
+        if (char.IsWhiteSpace(hash[i]))
+          throw new ArgumentException("Password hash cannot contain whitespace characters.", nameof(hash));
+      }
+    }
   }
 }
