@@ -38,6 +38,44 @@ namespace Domain.Tests.Validations
         }
 
         [Fact]
+        public void EnsureUtcNotBefore_ShouldNotThrowException_WhenValueIsValid()
+        {
+            // Arrange
+            var now = DateTimeOffset.UtcNow;
+            DateTimeOffset value = now;
+            DateTimeOffset reference = now.AddDays(-1); // Reference is in the past
+
+            // Act and Assert
+            var exception = Record.Exception(() => Guard.EnsureUtcNotBefore(value, reference, nameof(value)));
+            Assert.Null(exception);
+        }
+
+        [Fact]
+        public void EnsureUtcNotBefore_ShouldThrowException_WhenValueIsNotUtc()
+        {
+            // Arrange
+            DateTimeOffset value = DateTimeOffset.Now; // Not in UTC
+            DateTimeOffset reference = DateTimeOffset.UtcNow;
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => Guard.EnsureUtcNotBefore(value, reference, nameof(value)));
+            Assert.Contains("must be in UTC", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        public void EnsureUtcNotBefore_ShouldThrowException_WhenValueIsBeforeReference()
+        {
+            // Arrange
+            var now = DateTimeOffset.UtcNow;
+            DateTimeOffset value = now;
+            DateTimeOffset reference = now.AddDays(1); // Reference is in the future
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => Guard.EnsureUtcNotBefore(value, reference, nameof(value)));
+            Assert.Contains("cannot be before", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
         public void EnsureStringNotNullOrWhiteSpace_ShouldThrowException_WhenValueIsNull()
         {
             // Arrange
