@@ -42,6 +42,22 @@ namespace Domain.Validations
     }
 
     /// <summary>
+    /// Ensures that a DateOnly value is not a future date.
+    /// </summary>
+    /// <param name="value">The DateOnly value to validate.</param>
+    /// <param name="propertyName">The name of the property being validated.</param>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the value is a future date.
+    /// </exception>
+    public static void EnsureDateOnlyNotFuture(DateOnly value, string propertyName)
+    {
+      if (value > DateOnly.FromDateTime(DateTime.UtcNow))
+      {
+        throw new ArgumentException($"The property '{propertyName}' cannot be a future date.", propertyName);
+      }
+    }
+
+    /// <summary>
     /// Ensures that a string value is not null, empty, or consists only of whitespace characters.
     /// </summary>
     /// <param name="value">The string value to validate.</param>
