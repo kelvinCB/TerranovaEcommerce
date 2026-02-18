@@ -23,6 +23,25 @@ namespace Domain.Validations
     }
 
     /// <summary>
+    /// Ensures that a DateTimeOffset value is not before a specified reference DateTimeOffset value.
+    /// </summary>
+    /// <param name="value">The DateTimeOffset value to validate.</param>
+    /// <param name="reference">The reference DateTimeOffset value.</param>
+    /// <param name="propertyName">The name of the property being validated.</param>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the value is before the reference value.
+    /// </exception>
+    public static void EnsureUtcNotBefore(DateTimeOffset value, DateTimeOffset reference, string propertyName)
+    {
+      EnsureUtc(value, propertyName); // Ensure the value is in UTC before comparing
+
+      if (value < reference)
+      {
+        throw new ArgumentException($"The property '{propertyName}' cannot be before {reference}.", propertyName);
+      }
+    }
+
+    /// <summary>
     /// Ensures that a string value is not null, empty, or consists only of whitespace characters.
     /// </summary>
     /// <param name="value">The string value to validate.</param>
