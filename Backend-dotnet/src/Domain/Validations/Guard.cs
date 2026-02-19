@@ -94,6 +94,22 @@ namespace Domain.Validations
       }
     }
 
+    /// <summary>
+    /// Ensures that a Ulid value is initialized (not empty).
+    /// </summary>
+    /// <param name="value">The Ulid value to validate.</param>
+    /// <param name="propertyName">The name of the property being validated.</param>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the value is uninitialized (empty Ulid).
+    /// </exception>
+    public static void EnsureUlidNotEmpty(Ulid value, string propertyName)
+    {
+      if (IsUninitialized(value))
+      {
+        throw new ArgumentException($"The property '{propertyName}' is uninitialized.", propertyName);
+      }
+    }
+
     // Check if the value is default and return true if it is
     private static bool IsUninitialized<T>(T value) => EqualityComparer<T>.Default.Equals(value, default);
   }
