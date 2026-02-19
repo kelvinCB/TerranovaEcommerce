@@ -109,6 +109,22 @@ namespace Domain.Validations
         throw new ArgumentException($"The property '{propertyName}' is uninitialized.", propertyName);
       }
     }
+    
+    /// <summary>
+    /// Ensures that an object value is not null.
+    /// </summary>
+    /// <param name="value">The object value to validate.</param>
+    /// <param name="propertyName">The name of the property being validated.</param>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the value is null.
+    /// </exception>
+    public static void EnsureNotNull(Object? value, string propertyName)
+    {
+      if(value == null)
+      {
+        throw new ArgumentException($"The property '{propertyName}' cannot be null.", propertyName);
+      }
+    }
 
     // Check if the value is default and return true if it is
     private static bool IsUninitialized<T>(T value) => EqualityComparer<T>.Default.Equals(value, default);
