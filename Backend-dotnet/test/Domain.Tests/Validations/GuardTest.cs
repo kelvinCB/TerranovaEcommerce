@@ -162,5 +162,27 @@ namespace Domain.Tests.Validations
             var exception = Record.Exception(() => Guard.EnsureCharInitializedAndNotWhiteSpace(value, nameof(value)));
             Assert.Null(exception);
         }
+
+        [Fact]
+        public void EnsureUlidNotEmpty_ShouldNotThrowException_WhenValueIsValid()
+        {
+            // Arrange
+            Ulid value = Ulid.NewUlid();
+
+            // Act and Assert
+            var exception = Record.Exception(() => Guard.EnsureUlidNotEmpty(value, nameof(value)));
+            Assert.Null(exception);
+        }
+
+        [Fact]
+        public void EnsureUlidNotEmpty_ShouldThrowException_WhenValueIsUninitialized()
+        {
+            // Arrange
+            Ulid value = Ulid.Empty;
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => Guard.EnsureUlidNotEmpty(value, nameof(value)));
+            Assert.Contains("uninitialized", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
     }
 }
