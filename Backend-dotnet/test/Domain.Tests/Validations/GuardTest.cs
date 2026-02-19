@@ -76,6 +76,28 @@ namespace Domain.Tests.Validations
         }
 
         [Fact]
+        public void EnsureDateOnlyNotFuture_ShouldNotThrowException_WhenValueIsValid()
+        {
+            // Arrange
+            DateOnly value = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
+
+            // Act and Assert
+            var exception = Record.Exception(() => Guard.EnsureDateOnlyNotFuture(value, nameof(value)));
+            Assert.Null(exception);
+        }
+
+        [Fact]
+        public void EnsureDateOnlyNotFuture_ShouldThrowException_WhenValueIsFuture()
+        {
+            // Arrange
+            DateOnly value = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => Guard.EnsureDateOnlyNotFuture(value, nameof(value)));
+            Assert.Contains("cannot be a future date", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
         public void EnsureStringNotNullOrWhiteSpace_ShouldThrowException_WhenValueIsNull()
         {
             // Arrange
