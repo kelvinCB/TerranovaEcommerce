@@ -184,5 +184,27 @@ namespace Domain.Tests.Validations
             var exception = Assert.Throws<ArgumentException>(() => Guard.EnsureUlidNotEmpty(value, nameof(value)));
             Assert.Contains("uninitialized", exception.Message, StringComparison.OrdinalIgnoreCase);
         }
+
+        [Fact]
+        public void EnsureNotNull_ShouldNotThrowException_WhenValueIsValid()
+        {
+            // Arrange
+            var value = new Object();
+
+            // Act and Assert
+            var exception = Record.Exception(() => Guard.EnsureNotNull(value, nameof(value)));
+            Assert.Null(exception);
+        }
+
+        [Fact]
+        public void EnsureNotNull_ShouldThrowException_WhenValueIsNull()
+        {
+            // Arrange
+            Object? value = null;
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => Guard.EnsureNotNull(value, nameof(value)));
+            Assert.Contains("cannot be null", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
     }
 }
