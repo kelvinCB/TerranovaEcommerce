@@ -541,7 +541,7 @@ namespace Domain.Tests.Entities
             // Arrange
             var user = UserTestFactory.CreateUser();
             var newPasswordHash = PasswordHash.From(new String('b', 64));
-            var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(4)); // Its not utc
+            var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(4)); // Its not UTC
 
             // Act and Assert
             var exception = Assert.Throws<ArgumentException>(() => user.SetPasswordHash(newPasswordHash, timestamp));
@@ -559,6 +559,64 @@ namespace Domain.Tests.Entities
 
             // Act and Assert
             var exception = Assert.Throws<ArgumentException>(() => user.SetPasswordHash(newPasswordHash, timestamp));
+
+            Assert.Contains("cannot be before", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        [Trait("User", "SetIsActive")]
+        public void SetIsActive_ShouldSetIsDesative_WhenParametersAreValid()
+        {
+            // Arrange
+            var user = UserTestFactory.CreateUser();
+            var oldIsActive = user.IsActive; // true by default
+            var timestamp = user.UpdatedAt.AddMinutes(1);
+
+            // Act and Assert
+            var exception = Record.Exception(() => user.SetIsActive(false, timestamp)); // Set false
+
+            Assert.Null(exception);
+            Assert.NotEqual(oldIsActive, user.IsActive);
+        }
+
+        [Fact]
+        [Trait("User", "SetIsActive")]
+        public void SetIsActive_ShouldThrowException_WhenTimestampIsUninitialized()
+        {
+            // Arrange
+            var user = UserTestFactory.CreateUser();
+            var timestamp = default(DateTimeOffset);
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => user.SetIsActive(false, timestamp));
+
+            Assert.Contains("is uninitialized", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        [Trait("User", "SetIsActive")]
+        public void SetIsActive_ShouldThrowException_WhenTimestampIsNotUtc()
+        {
+            // Arrange
+            var user = UserTestFactory.CreateUser();
+            var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4)); // Its not UTC.
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => user.SetIsActive(false, timestamp));
+
+            Assert.Contains("must be in UTC", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        [Trait("User", "SetIsActive")]
+        public void SetIsActive_ShouldThrowException_WhenTimestampIsBeforeCreateAt()
+        {
+            // Arrange
+            var user = UserTestFactory.CreateUser();
+            var timestamp = user.CreatedAt.AddMinutes(-1);
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => user.SetIsActive(false, timestamp));
 
             Assert.Contains("cannot be before", exception.Message, StringComparison.OrdinalIgnoreCase);
         }
