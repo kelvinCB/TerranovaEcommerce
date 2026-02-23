@@ -471,7 +471,7 @@ namespace Domain.Tests.Entities
 
         [Fact]
         [Trait("User", "Update")]
-        public void Update_ShouldThrowException_WhenTimestampIsNotBeforeCreatedAt()
+        public void Update_ShouldThrowException_WhenTimestampIsBeforeCreatedAt()
         {
             // Arrange
             var user = UserTestFactory.CreateUser();
@@ -481,6 +481,84 @@ namespace Domain.Tests.Entities
             var exception = Assert.Throws<ArgumentException>(() => user.Update(
                 timestamp: timestamp
             ));
+
+            Assert.Contains("cannot be before", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        [Trait("User", "SetPasswordHash")]
+        public void SetPasswordHash_ShouldSetPasswordHash_WhenParametersAreValid()
+        {
+            // Arrange
+            var user = UserTestFactory.CreateUser();
+            var oldPasswordHash = user.PasswordHash;
+            var newPasswordHash = PasswordHash.From(new String('b', 64));
+            var timestamp = user.UpdatedAt.AddMinutes(1);
+
+            // Act and Assert
+            var exception = Record.Exception(() => user.SetPasswordHash(newPasswordHash, timestamp));
+
+            Assert.Null(exception);
+            Assert.NotEqual(oldPasswordHash, user.PasswordHash);
+            Assert.Equal(newPasswordHash, user.PasswordHash);
+        }
+
+        [Fact]
+        [Trait("User", "SetPasswordHash")]
+        public void SetPasswordHash_ShouldThrowException_WhenPasswordHashIsNull()
+        {
+            // Arrange
+            var user = UserTestFactory.CreateUser();
+            var oldPasswordHash = user.PasswordHash;
+            PasswordHash? newNullPasswordHash = null;
+            var timestamp = user.UpdatedAt.AddMinutes(1);
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => user.SetPasswordHash(newNullPasswordHash!, timestamp)); // Force non-nullable for testing
+
+            Assert.Contains("cannot be null", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        [Trait("User", "SetPasswordHash")]
+        public void SetPasswordHash_ShouldThrowException_WhenTimestampIsUninitialized()
+        {
+            // Arrange
+            var user = UserTestFactory.CreateUser();
+            var newPasswordHash = PasswordHash.From(new String('b', 64));
+            var timestamp = default(DateTimeOffset);
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => user.SetPasswordHash(newPasswordHash, timestamp));
+
+            Assert.Contains("is uninitialized", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        [Trait("User", "SetPasswordHash")]
+        public void SetPasswordHash_ShouldThrowException_WhenTimestampIsNotUtc()
+        {
+            // Arrange
+            var user = UserTestFactory.CreateUser();
+            var newPasswordHash = PasswordHash.From(new String('b', 64));
+            var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(4)); // Its not utc
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => user.SetPasswordHash(newPasswordHash, timestamp));
+
+            Assert.Contains("Must be in UTC", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        [Trait("User", "SetPasswordHash")]
+        public void SetPasswordHash_ShouldThrowException_WhenTimestampIsBeforeCreateAt()
+        {
+            var user = UserTestFactory.CreateUser();
+            var newPasswordHash = PasswordHash.From(new String('b', 64));
+            var timestamp = user.CreatedAt.AddMinutes(-1);
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => user.SetPasswordHash(newPasswordHash, timestamp));
 
             Assert.Contains("cannot be before", exception.Message, StringComparison.OrdinalIgnoreCase);
         }
