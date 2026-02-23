@@ -620,5 +620,63 @@ namespace Domain.Tests.Entities
 
             Assert.Contains("cannot be before", exception.Message, StringComparison.OrdinalIgnoreCase);
         }
+
+        [Fact]
+        [Trait("User", "SetIsDeleted")]
+        public void SetIsDeleted_ShouldSetDeleted_WhenParamatersAreValid()
+        {
+            // Arrange
+            var user = UserTestFactory.CreateUser();
+            var oldIsDeleted = user.IsDeleted; // false by default
+            var timestamp = user.UpdatedAt.AddMinutes(1);
+
+            // Act and Assert
+            var exception = Record.Exception(() => user.SetIsDeleted(true, timestamp)); // Set true
+
+            Assert.Null(exception);
+            Assert.NotEqual(oldIsDeleted, user.IsDeleted);
+        }
+
+        [Fact]
+        [Trait("User", "SetIsDeleted")]
+        public void SetIsDeleted_ShouldThrowException_WhenTimestampIsUninitialized()
+        {
+            // Arrange
+            var user = UserTestFactory.CreateUser();
+            var timestamp = default(DateTimeOffset);
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => user.SetIsDeleted(true, timestamp));
+
+            Assert.Contains("Is uninitialized", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        [Trait("User", "SetIsDeleted")]
+        public void SetIsDeleted_ShouldThrowException_WhenTimestampIsNotUtc()
+        {
+            // Arrange
+            var user = UserTestFactory.CreateUser();
+            var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4)); // Its not UTC
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => user.SetIsDeleted(true, timestamp));
+
+            Assert.Contains("Must be in UTC", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        [Trait("User", "SetIsDeleted")]
+        public void SetIsDeleted_ShouldThrowException_WhenTimespanIsBeforeCreateAt()
+        {
+            // Arrange
+            var user = UserTestFactory.CreateUser();
+            var timestamp = user.CreatedAt.AddMinutes(-1);
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => user.SetIsDeleted(true, timestamp));
+
+            Assert.Contains("Cannot be before", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
     }
 }
