@@ -678,5 +678,82 @@ namespace Domain.Tests.Entities
 
             Assert.Contains("Cannot be before", exception.Message, StringComparison.OrdinalIgnoreCase);
         }
+
+        [Fact]
+        [Trait("User", "SetEmailAddress")]
+        public void SetEmailAddress_ShouldSetEmailAddress_WhenParametersAreValid()
+        {
+            // Arrange
+            var user = UserTestFactory.CreateUser();
+            var oldEmailAddress = user.EmailAddress; // test@example.com by default in UserTestFactory
+            var newEmailAddress = Email.Create("example@test.com");
+            var timestamp = user.UpdatedAt.AddMinutes(1);
+
+            // Act and Assert
+            var exception = Record.Exception(() => user.SetEmailAddress(newEmailAddress, timestamp));
+
+            Assert.Null(exception);
+            Assert.NotEqual(oldEmailAddress, user.EmailAddress);
+        }
+
+        [Fact]
+        [Trait("User", "SetEmailAddress")]
+        public void SetEmailAddress_ShouldThrowException_WhenEmailAddresIsNull()
+        {
+            // Arrange
+            var user = UserTestFactory.CreateUser();
+            var newEmailAddress = default(Email);
+            var timestamp = user.UpdatedAt.AddMinutes(1);
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => user.SetEmailAddress(newEmailAddress!, timestamp)); // Force non-nullable for testing
+
+            Assert.Contains("Cannot be null", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        [Trait("User", "SetEmailAddress")]
+        public void SetEmailAddress_ShouldThrowException_WhenTimestampIsUninitialized()
+        {
+            // Arrange
+            var user = UserTestFactory.CreateUser();
+            var newEmailAddress = Email.Create("example@test.com");
+            var timestamp = default(DateTimeOffset);
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => user.SetEmailAddress(newEmailAddress, timestamp));
+
+            Assert.Contains("Is uninitialized", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        [Trait("User", "SetEmailAddress")]
+        public void SetEmailAddress_ShouldThrowException_WhenTimestampIsNotUtc()
+        {
+            // Arrange
+            var user = UserTestFactory.CreateUser();
+            var newEmailAddress = Email.Create("example@test.com");
+            var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4)); // Its not UTC
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => user.SetEmailAddress(newEmailAddress, timestamp));
+
+            Assert.Contains("Must be in UTC", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        [Trait("User", "SetEmailAddress")]
+        public void SetEmailAddress_ShouldThrowException_WhenTimestampIsBeforeCreateAt()
+        {
+            // Arrange
+            var user = UserTestFactory.CreateUser();
+            var newEmailAddress = Email.Create("example@test.com");
+            var timestamp = user.CreatedAt.AddMinutes(-1);
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => user.SetEmailAddress(newEmailAddress, timestamp));
+
+            Assert.Contains("Cannot be before", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
     }
 }
