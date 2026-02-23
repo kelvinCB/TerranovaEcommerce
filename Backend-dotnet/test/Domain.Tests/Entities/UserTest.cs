@@ -565,7 +565,7 @@ namespace Domain.Tests.Entities
 
         [Fact]
         [Trait("User", "SetIsActive")]
-        public void SetIsActive_ShouldSetIsDesative_WhenParametersAreValid()
+        public void SetIsActive_ShouldDesactiveUser_WhenParametersAreValid()
         {
             // Arrange
             var user = UserTestFactory.CreateUser();
@@ -623,7 +623,7 @@ namespace Domain.Tests.Entities
 
         [Fact]
         [Trait("User", "SetIsDeleted")]
-        public void SetIsDeleted_ShouldSetDeleted_WhenParamatersAreValid()
+        public void SetIsDeleted_ShouldSetDeleted_WhenParametersAreValid()
         {
             // Arrange
             var user = UserTestFactory.CreateUser();
@@ -667,7 +667,7 @@ namespace Domain.Tests.Entities
 
         [Fact]
         [Trait("User", "SetIsDeleted")]
-        public void SetIsDeleted_ShouldThrowException_WhenTimespanIsBeforeCreateAt()
+        public void SetIsDeleted_ShouldThrowException_WhenTimestampIsBeforeCreateAt()
         {
             // Arrange
             var user = UserTestFactory.CreateUser();
@@ -698,7 +698,7 @@ namespace Domain.Tests.Entities
 
         [Fact]
         [Trait("User", "SetEmailAddress")]
-        public void SetEmailAddress_ShouldThrowException_WhenEmailAddresIsNull()
+        public void SetEmailAddress_ShouldThrowException_WhenEmailAddressIsNull()
         {
             // Arrange
             var user = UserTestFactory.CreateUser();
@@ -911,6 +911,6 @@ namespace Domain.Tests.Entities
 
             Assert.Contains("Cannot be before", exception.Message, StringComparison.OrdinalIgnoreCase);
         }
-        
+
     }
 }
