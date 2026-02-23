@@ -755,5 +755,84 @@ namespace Domain.Tests.Entities
 
             Assert.Contains("Cannot be before", exception.Message, StringComparison.OrdinalIgnoreCase);
         }
+
+        [Fact]
+        [Trait("User", "SetPhoneNumber")]
+        public void SetPhoneNumber_ShouldSetPhoneNumber_WhenParametersAreValid()
+        {
+            // Arrange
+            var user = UserTestFactory.CreateUser();
+            var oldPhoneNumber = user.PhoneNumber; // +18298881212 by default in UserTestFactory
+            var newPhoneNumber = PhoneNumber.Create("+8292226161");
+            var timestamp = user.UpdatedAt.AddMinutes(1);
+
+            // Act and Assert
+            var exception = Record.Exception(() => user.SetPhoneNumber(newPhoneNumber, timestamp));
+
+            Assert.Null(exception);
+            Assert.NotEqual(oldPhoneNumber, user.PhoneNumber);
+        }
+
+        [Fact]
+        [Trait("User", "SetPhoneNumber")]
+        public void SetPhoneNumber_ShouldSetPhoneNumber_WhenPhoneNumberIsNull()
+        {
+            // Arrange
+            var user = UserTestFactory.CreateUser();
+            var oldPhoneNumber = user.PhoneNumber;
+            var newPhoneNumber = default(PhoneNumber);
+            var timestamp = user.UpdatedAt.AddMinutes(1);
+
+            // Act and Assert
+            var exception = Record.Exception(() => user.SetPhoneNumber(newPhoneNumber, timestamp));
+
+            Assert.Null(exception);
+            Assert.NotEqual(oldPhoneNumber, user.PhoneNumber);
+        }
+
+        [Fact]
+        [Trait("User", "SetPhoneNumber")]
+        public void SetPhoneNumber_ShouldThrowException_WhenTimestampIsUninitialized()
+        {
+            // Arrange
+            var user = UserTestFactory.CreateUser();
+            var newPhoneNumber = PhoneNumber.Create("+8292226161");
+            var timestamp = default(DateTimeOffset);
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => user.SetPhoneNumber(newPhoneNumber, timestamp));
+
+            Assert.Contains("Is uninitialized", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        [Trait("User", "SetPhoneNumber")]
+        public void SetPhoneNumber_ShouldThrowException_WhenTimestampIsNotUtc()
+        {
+            // Arrange
+            var user = UserTestFactory.CreateUser();
+            var newPhoneNumber = PhoneNumber.Create("+8292226161");
+            var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4)); // Its not UTC
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => user.SetPhoneNumber(newPhoneNumber, timestamp));
+
+            Assert.Contains("Must be in UTC", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        [Trait("User", "SetPhoneNumber")]
+        public void SetPhoneNumber_ShouldThrowException_WhenTimestampIsBeforeCreatedAt()
+        {
+            // Arrange
+            var user = UserTestFactory.CreateUser();
+            var newPhoneNumber = PhoneNumber.Create("+8292226161");
+            var timestamp = user.CreatedAt.AddMinutes(-1);
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => user.SetPhoneNumber(newPhoneNumber, timestamp));
+
+            Assert.Contains("Cannot be before", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
     }
 }
