@@ -834,5 +834,83 @@ namespace Domain.Tests.Entities
 
             Assert.Contains("Cannot be before", exception.Message, StringComparison.OrdinalIgnoreCase);
         }
+
+        [Fact]
+        [Trait("User", "SetBirthDate")]
+        public void SetBirthDate_ShouldSetBirthDate_WhenParametersAreValid()
+        {
+            // Arrange
+            var user = UserTestFactory.CreateUser();
+            var oldBirthDate = user.BirthDate;
+            var newBirthDate = user.BirthDate.AddYears(-1);
+            var timestamp = user.CreatedAt.AddMinutes(1);
+
+            // Act and Assert
+            var exception = Record.Exception(() => user.SetBirthDate(newBirthDate, timestamp));
+
+            Assert.Null(exception);
+            Assert.NotEqual(oldBirthDate, user.BirthDate);
+        }
+
+        [Fact]
+        [Trait("User", "SetBirthDate")]
+        public void SetBirthDate_ShouldThrowException_WhenBirthDateIsInFuture()
+        {
+            // Arrange
+            var user = UserTestFactory.CreateUser();
+            var newBirthDate = DateOnly.FromDateTime(DateTime.Now).AddDays(1); // new birth date set for tomorrow
+            var timestamp = user.CreatedAt.AddMinutes(1);
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => user.SetBirthDate(newBirthDate, timestamp));
+
+            Assert.Contains("Cannot be a future date", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        [Trait("User", "SetBirthDate")]
+        public void SetBirthDate_ShouldThrowException_WhenTimestampIsUninitialized()
+        {
+            // Arrange
+            var user = UserTestFactory.CreateUser();
+            var newBirthDate = user.BirthDate.AddYears(-1);
+            var timestamp = default(DateTimeOffset);
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => user.SetBirthDate(newBirthDate, timestamp));
+
+            Assert.Contains("Is uninitialized", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        [Trait("User", "SetBirthDate")]
+        public void SetBirthDate_ShouldThrowException_WhenTimestampIsNotUtc()
+        {
+            // Arrange
+            var user = UserTestFactory.CreateUser();
+            var newBirthDate = user.BirthDate.AddYears(-1);
+            var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4)); // Its not UTC
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => user.SetBirthDate(newBirthDate, timestamp));
+
+            Assert.Contains("Must be in UTC", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        [Trait("User", "SetBirthDate")]
+        public void SetBirthDate_ShouldThrowException_WhenTimestampIsBeforeCreatedAt()
+        {
+            // Arrange
+            var user = UserTestFactory.CreateUser();
+            var newBirthDate = user.BirthDate.AddYears(-1);
+            var timestamp = user.CreatedAt.AddMinutes(-1);
+
+            // Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => user.SetBirthDate(newBirthDate, timestamp));
+
+            Assert.Contains("Cannot be before", exception.Message, StringComparison.OrdinalIgnoreCase);
+        }
+        
     }
 }
