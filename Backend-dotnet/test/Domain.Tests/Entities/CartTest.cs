@@ -1,11 +1,14 @@
 using Domain.Entities;
+using Domain.Tests.Factories;
 
-namespace Domain.Test.Entities;
+namespace Domain.Tests.Entities;
 
+[Trait("Layer", "Domain")]
 public class CartTest
 {
     [Fact]
-    public void CreateCart_ShouldCreateCartWithValidUserId()
+    [Trait("Cart", "Create")]
+    public void Create_ShouldCreateCart_WhenParametersAreValid()
     {
         // Arrange
         var id = Ulid.NewUlid();
@@ -13,7 +16,7 @@ public class CartTest
         var timestamp = DateTimeOffset.UtcNow;
 
         // Act
-        var cart = new Cart(id, userId, timestamp);
+        var cart = Cart.Create(id, userId, timestamp);
 
         // Assert
         Assert.NotNull(cart);
@@ -27,7 +30,8 @@ public class CartTest
     }
 
     [Fact]
-    public void CreateCart_ShouldThrowException_WhenIdIsEmpty()
+    [Trait("Cart", "Create")]
+    public void Create_ShouldThrowException_WhenIdIsEmpty()
     {
         // Arrange
         var id = Ulid.Empty;
@@ -35,12 +39,14 @@ public class CartTest
         var timestamp = DateTimeOffset.UtcNow;
 
         // Act and Assert
-        var exception = Assert.Throws<ArgumentException>(() => new Cart(id, userId, timestamp));
-        Assert.Contains("Id is required.", exception.Message);
+        var exception = Assert.Throws<ArgumentException>(() => Cart.Create(id, userId, timestamp));
+
+        Assert.Contains("Is Uninitialized", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
-    public void CreateCart_ShouldThrowException_WhenUserIdIsEmpty()
+    [Trait("Cart", "Create")]
+    public void Create_ShouldThrowException_WhenUserIdIsEmpty()
     {
         // Arrange
         var id = Ulid.NewUlid();
@@ -48,12 +54,14 @@ public class CartTest
         var timestamp = DateTimeOffset.UtcNow;
 
         // Act and Assert
-        var exception = Assert.Throws<ArgumentException>(() => new Cart(id, userId, timestamp));
-        Assert.Contains("User Id is required.", exception.Message);
+        var exception = Assert.Throws<ArgumentException>(() => Cart.Create(id, userId, timestamp));
+
+        Assert.Contains("Is Uninitialized", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
-    public void CreateCart_ShouldThrowException_WhenCreatedAtIsNotUtc()
+    [Trait("Cart", "Create")]
+    public void Create_ShouldThrowException_WhenCreatedAtIsNotUtc()
     {
         // Arrange
         var id = Ulid.NewUlid();
@@ -61,65 +69,63 @@ public class CartTest
         var timestamp = DateTimeOffset.Now;
 
         // Act and Assert
-        var exception = Assert.Throws<ArgumentException>(() => new Cart(id, userId, timestamp));
-        Assert.Contains("Timestamp must be in UTC (offset 00:00).", exception.Message);
+        var exception = Assert.Throws<ArgumentException>(() => Cart.Create(id, userId, timestamp));
+
+        Assert.Contains("Timestamp must be in UTC (offset 00:00).", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
-    public void UpdateCart_ShouldUpdatePropertyUpdatedAt()
+    [Trait("Cart", "Update")]
+    public void Update_ShouldUpdatePropertyUpdatedAt()
     {
         // Arrange
-        var id = Ulid.NewUlid();
-        var userId = Ulid.NewUlid();
-        var timestamp = DateTimeOffset.UtcNow;
-        var cart = new Cart(id, userId, timestamp);
+        var cart = CartTestFactory.CreateCart();
         var originalUpdatedAt = cart.UpdatedAt;
 
         // Act
-        cart.UpdateCart(timestamp.AddMinutes(1));
+        cart.Update(cart.UpdatedAt.AddMinutes(1));
+
         // Assert
         Assert.True(cart.UpdatedAt > originalUpdatedAt);
     }
 
     [Fact]
-    public void UpdateCart_ShouldThrowException_WhenUpdatedAtIsBeforeCreatedAt()
+    [Trait("Cart", "Update")]
+    public void Update_ShouldThrowException_WhenUpdatedAtIsBeforeCreatedAt()
     {
         // Arrange
-        var id = Ulid.NewUlid();
-        var userId = Ulid.NewUlid();
-        var timestamp = DateTimeOffset.UtcNow;
-        var cart = new Cart(id, userId, timestamp);
+        var cart = CartTestFactory.CreateCart();
 
         // Act and Assert
-        var exception = Assert.Throws<ArgumentException>(() => cart.UpdateCart(timestamp.AddMinutes(-1)));
-        Assert.Contains("UpdatedAt cannot be before CreatedAt.", exception.Message);
+        var exception = Assert.Throws<ArgumentException>(() => cart.Update(cart.UpdatedAt.AddMinutes(-1)));
+
+        Assert.Contains("Cannot be before", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
-    public void UpdateCart_ShouldThrowException_WhenUpdatedAtIsDefault()
+    [Trait("Cart", "Update")]
+    public void Update_ShouldThrowException_WhenUpdatedAtIsDefault()
     {
         // Arrange
-        var id = Ulid.NewUlid();
-        var userId = Ulid.NewUlid();
-        var timestamp = DateTimeOffset.UtcNow;
-        var cart = new Cart(id, userId, timestamp);
+        var cart = CartTestFactory.CreateCart();
 
         // Act and Assert
-        var exception = Assert.Throws<ArgumentException>(() => cart.UpdateCart(default));
-        Assert.Contains("Timestamp is uninitialized.", exception.Message);
+        var exception = Assert.Throws<ArgumentException>(() => cart.Update(default));
+
+        Assert.Contains("Timestamp is uninitialized.", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
-    public void UpdateCart_ShouldThrowException_WhenUpdatedAtIsNotUtc()
+    [Trait("Cart", "Update")]
+    public void Update_ShouldThrowException_WhenUpdatedAtIsNotUtc()
     {
         // Arrange
-        var id = Ulid.NewUlid();
-        var userId = Ulid.NewUlid();
-        var timestamp = DateTimeOffset.UtcNow;
-        var cart = new Cart(id, userId, timestamp);
+        var cart = CartTestFactory.CreateCart();
+        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4)); // It's not UTC
 
         // Act and Assert
-        var exception = Assert.Throws<ArgumentException>(() => cart.UpdateCart(DateTimeOffset.Now));
-        Assert.Contains("Timestamp must be in UTC (offset 00:00).", exception.Message);
+        var exception = Assert.Throws<ArgumentException>(() => cart.Update(timestamp));
+
+        Assert.Contains("Timestamp must be in UTC (offset 00:00).", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 }
