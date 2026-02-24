@@ -2,10 +2,12 @@ using Domain.ValueObjects;
 
 namespace Domain.Tests.ValueObjects;
 
+[Trait("Layer", "Domain")]
 public class PhoneNumberTest
 {
     [Fact]
-    public void PhoneNumber_ShouldCreatePhoneNumber_WhenValueIsValid()
+    [Trait("PhoneNumber", "Create")]
+    public void Create_ShouldCreatePhoneNumber_WhenValueIsValid()
     {
         // Arrange
         var validPhoneNumber = "+8298881212";
@@ -19,7 +21,8 @@ public class PhoneNumberTest
     }
 
     [Fact]
-    public void PhoneNumber_ShouldNormalizePhoneNumber_WhenValueIsValidWithoutPlus()
+    [Trait("PhoneNumber", "Create")]
+    public void Create_ShouldNormalizePhoneNumber_WhenValueIsValidWithoutPlus()
     {
         // Arrange
         var validPhoneNumberWithoutPlus = "18298881212";
@@ -33,7 +36,8 @@ public class PhoneNumberTest
     }
 
     [Fact]
-    public void PhoneNumber_ShouldThrowException_WhenValueIsNull()
+    [Trait("PhoneNumber", "Create")]
+    public void Create_ShouldThrowException_WhenValueIsNull()
     {
         // Arrange
         string? nullPhoneNumber = default;
@@ -46,7 +50,8 @@ public class PhoneNumberTest
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
-    public void PhoneNumber_ShouldThrowException_WhenValueIsEmptyOrWhitespace(string input)
+    [Trait("PhoneNumber", "Create")]
+    public void Create_ShouldThrowException_WhenValueIsEmptyOrWhitespace(string input)
     {
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(() => PhoneNumber.Create(input));
@@ -54,7 +59,8 @@ public class PhoneNumberTest
     }
 
     [Fact]
-    public void PhoneNumber_ShouldTrimValue()
+    [Trait("PhoneNumber", "Create")]
+    public void Create_ShouldTrimValue()
     {
         var phoneNumber = PhoneNumber.Create("  +8298881212  ");
 
@@ -66,7 +72,8 @@ public class PhoneNumberTest
     [InlineData("+0")]
     [InlineData("+1 8298881212")]
     [InlineData("+1-829-888-1212")]
-    public void PhoneNumber_ShouldThrowException_WhenValueIsInvalid(string input)
+    [Trait("PhoneNumber", "Create")]
+    public void Create_ShouldThrowException_WhenValueIsInvalid(string input)
     {
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(() => PhoneNumber.Create(input));
@@ -74,7 +81,8 @@ public class PhoneNumberTest
     }
 
     [Fact]
-    public void PhoneNumber_ShouldReturnValue_WhenToStringIsCalled()
+    [Trait("PhoneNumber", "Create")]
+    public void Create_ShouldReturnValue_WhenToStringIsCalled()
     {
         // Arrange
         var validPhoneNumber = "+8298881212";
