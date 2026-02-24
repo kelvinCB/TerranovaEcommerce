@@ -49,6 +49,13 @@ TerranovaEcommerce/
    pnpm -C Client build
    ```
 
+## 📚 Documentation
+
+- [PRD Guide](docs/PRD_GUIDE.md)
+- [Frontend Guide](docs/FRONTEND_GUIDE.md)
+- [Testing Guide](docs/TESTING_GUIDE.md)
+- [Dev Notes](docs/DEV_NOTES.md)
+
 ## 📄 License
 
 MIT
