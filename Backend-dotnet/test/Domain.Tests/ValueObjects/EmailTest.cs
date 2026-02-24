@@ -2,10 +2,12 @@ using Domain.ValueObjects;
 
 namespace Domain.Tests.ValueObjects;
 
+[Trait("Layer", "Domain")]
 public class EmailTest
 {
     [Fact]
-    public void Email_ShouldCreateEmail_WhenValueIsValid()
+    [Trait("Email", "Create")]
+    public void Create_ShouldCreateEmail_WhenValueIsValid()
     {
         // Arrange
         var validEmail = "test@example.com";
@@ -18,7 +20,8 @@ public class EmailTest
     }
 
     [Fact]
-    public void Email_ShouldThrowArgumentException_WhenValueIsNull()
+    [Trait("Email", "Create")]
+    public void Create_ShouldThrowArgumentException_WhenValueIsNull()
     {
         // Arrange
         string? nullEmail = null;
@@ -29,7 +32,8 @@ public class EmailTest
     }
 
     [Fact]
-    public void Email_ShouldThrowArgumentException_WhenValueHasSpaces()
+    [Trait("Email", "Create")]
+    public void Create_ShouldThrowArgumentException_WhenValueHasSpaces()
     {
         // Arrange
         var emailWithSpaces = "test @example.com";
@@ -40,7 +44,8 @@ public class EmailTest
     }
 
     [Fact]
-    public void Email_ShouldThrowArgumentException_WhenValueHasMultipleAtSymbols()
+    [Trait("Email", "Create")]
+    public void Create_ShouldThrowArgumentException_WhenValueHasMultipleAtSymbols()
     {
         // Arrange
         var emailWithMultipleAt = "test@@example.com";
@@ -51,7 +56,8 @@ public class EmailTest
     }
 
     [Fact]
-    public void Email_ShouldThrowArgumentException_WhenValueHasNoAtSymbol()
+    [Trait("Email", "Create")]
+    public void Create_ShouldThrowArgumentException_WhenValueHasNoAtSymbol()
     {
         // Arrange
         var emailWithNoAt = "testexample.com";
@@ -62,7 +68,8 @@ public class EmailTest
     }
 
     [Fact]
-    public void Email_ShouldThrowArgumentException_WhenValueHasInvalidFormat()
+    [Trait("Email", "Create")]
+    public void Create_ShouldThrowArgumentException_WhenValueHasInvalidFormat()
     {
         // Arrange
         var invalidEmail = "test@.com";
