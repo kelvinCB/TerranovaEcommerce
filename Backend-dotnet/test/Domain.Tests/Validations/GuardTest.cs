@@ -2,9 +2,11 @@ using Domain.Validations;
 
 namespace Domain.Tests.Validations;
 
+[Trait("Layer", "Domain")]
 public class GuardTest
 {
     [Fact]
+    [Trait("Guard", "EnsureUtc")]
     public void EnsureUtc_ShouldThrowArgumentException_WhenValueIsUninitialized()
     {
         // Arrange
@@ -16,6 +18,7 @@ public class GuardTest
     }
 
     [Fact]
+    [Trait("Guard", "EnsureUtc")]
     public void EnsureUtc_ShouldThrowArgumentException_WhenValueIsNotUtc()
     {
         // Arrange
@@ -27,6 +30,7 @@ public class GuardTest
     }
 
     [Fact]
+    [Trait("Guard", "EnsureUtc")]
     public void EnsureUtc_ShouldNotThrowException_WhenValueIsValid()
     {
         // Arrange
@@ -38,6 +42,7 @@ public class GuardTest
     }
 
     [Fact]
+    [Trait("Guard", "EnsureUtcNotBefore")]
     public void EnsureUtcNotBefore_ShouldNotThrowException_WhenValueIsValid()
     {
         // Arrange
@@ -51,6 +56,7 @@ public class GuardTest
     }
 
     [Fact]
+    [Trait("Guard", "EnsureUtcNotBefore")]
     public void EnsureUtcNotBefore_ShouldThrowException_WhenValueIsNotUtc()
     {
         // Arrange
@@ -63,6 +69,7 @@ public class GuardTest
     }
 
     [Fact]
+    [Trait("Guard", "EnsureUtcNotBefore")]
     public void EnsureUtcNotBefore_ShouldThrowException_WhenValueIsBeforeReference()
     {
         // Arrange
@@ -76,6 +83,7 @@ public class GuardTest
     }
 
     [Fact]
+    [Trait("Guard", "EnsureDateOnlyNotFuture")]
     public void EnsureDateOnlyNotFuture_ShouldNotThrowException_WhenValueIsValid()
     {
         // Arrange
@@ -87,6 +95,7 @@ public class GuardTest
     }
 
     [Fact]
+    [Trait("Guard", "EnsureDateOnlyNotFuture")]
     public void EnsureDateOnlyNotFuture_ShouldThrowException_WhenValueIsFuture()
     {
         // Arrange
@@ -98,6 +107,7 @@ public class GuardTest
     }
 
     [Fact]
+    [Trait("Guard", "EnsureStringNotNullOrWhiteSpace")]
     public void EnsureStringNotNullOrWhiteSpace_ShouldThrowException_WhenValueIsNull()
     {
         // Arrange
@@ -109,6 +119,7 @@ public class GuardTest
     }
 
     [Fact]
+    [Trait("Guard", "EnsureStringNotNullOrWhiteSpace")]
     public void EnsureStringNotNullOrWhiteSpace_ShouldThrowException_WhenValueHasOnlyWhitespace()
     {
         // Arrange
@@ -120,6 +131,7 @@ public class GuardTest
     }
 
     [Fact]
+    [Trait("Guard", "EnsureStringNotNullOrWhiteSpace")]
     public void EnsureStringNotNullOrWhiteSpace_ShouldNotThrowException_WhenValueIsValid()
     {
         // Arrange
@@ -131,6 +143,7 @@ public class GuardTest
     }
 
     [Fact]
+    [Trait("Guard", "EnsureCharInitializedAndNotWhiteSpace")]
     public void EnsureCharInitializedAndNotWhiteSpace_ShouldThrowException_WhenValueIsUninitialized()
     {
         // Arrange
@@ -142,6 +155,7 @@ public class GuardTest
     }
 
     [Fact]
+    [Trait("Guard", "EnsureCharInitializedAndNotWhiteSpace")]
     public void EnsureCharInitializedAndNotWhiteSpace_ShouldThrowException_WhenValueHasOnlyWhitespace()
     {
         // Arrange
@@ -153,6 +167,7 @@ public class GuardTest
     }
 
     [Fact]
+    [Trait("Guard", "EnsureCharInitializedAndNotWhiteSpace")]
     public void EnsureCharInitializedAndNotWhiteSpace_ShouldNotThrowException_WhenValueIsValid()
     {
         // Arrange
@@ -164,6 +179,7 @@ public class GuardTest
     }
 
     [Fact]
+    [Trait("Guard", "EnsureUlidNotEmpty")]
     public void EnsureUlidNotEmpty_ShouldNotThrowException_WhenValueIsValid()
     {
         // Arrange
@@ -175,6 +191,7 @@ public class GuardTest
     }
 
     [Fact]
+    [Trait("Guard", "EnsureUlidNotEmpty")]
     public void EnsureUlidNotEmpty_ShouldThrowException_WhenValueIsUninitialized()
     {
         // Arrange
@@ -186,6 +203,7 @@ public class GuardTest
     }
 
     [Fact]
+    [Trait("Guard", "EnsureNotNull")]
     public void EnsureNotNull_ShouldNotThrowException_WhenValueIsValid()
     {
         // Arrange
@@ -197,6 +215,7 @@ public class GuardTest
     }
 
     [Fact]
+    [Trait("Guard", "EnsureNotNull")]
     public void EnsureNotNull_ShouldThrowException_WhenValueIsNull()
     {
         // Arrange
