@@ -36,8 +36,7 @@ public class Cart
     /// <param name="userId">The user identifier.</param>
     /// <param name="timestamp">The timestamp for when the cart was created.</param>
     /// <returns>A new instance of the Cart class.</returns>
-    /// <exception cref="ArgumentException">Thrown when the id is empty</exception>
-    /// <exception cref="ArgumentException">Thrown when the userId is empty</exception>
+    /// <exception cref="ArgumentException">Thrown when the cart identifier or user identifier is empty</exception>
     /// <exception cref="ArgumentException">Thrown when the timestamp is not in UTC</exception>
     public static Cart Create
     (
@@ -46,8 +45,8 @@ public class Cart
         DateTimeOffset timestamp
     )
     {
-        if (id == Ulid.Empty) throw new ArgumentException("Id is required.", nameof(id));
-        if (userId == Ulid.Empty) throw new ArgumentException("User Id is required.", nameof(userId));
+        Guard.EnsureUlidNotEmpty(id, nameof(id));
+        Guard.EnsureUlidNotEmpty(userId, nameof(userId));
 
         Guard.EnsureUtc(timestamp, nameof(timestamp));
 
@@ -64,17 +63,17 @@ public class Cart
     /// The new timestamp must be in UTC and cannot be before the <see cref="CreatedAt"/> timestamp.
     /// </summary>
     /// <param name="timestamp">The new timestamp for updating the cart.</param>
-    /// <exception cref="InvalidOperationException">Thrown when the cart's CreatedAt timestamp is not set.</exception>
-    /// <exception cref="ArgumentException">Thrown when the new timestamp is before the CreatedAt timestamp.</exception>
-    public void UpdateCart(DateTimeOffset timestamp)
+    /// <exception cref="ArgumentException">Thrown when the timestamp is not in UTC</exception>
+    /// <exception cref="ArgumentException">Thrown when the timestamp is before the <see cref="CreatedAt"/> timestamp</exception>
+    /// <remarks>
+    /// Allows updating the cart only when the <see cref="UpdatedAt"/>
+    /// timestamp is after to the <see cref="CreatedAt"/> timestamp.
+    /// </remarks>
+    public void Update(DateTimeOffset timestamp)
     {
         Guard.EnsureUtc(timestamp, nameof(timestamp));
 
-        if (CreatedAt == default)
-            throw new InvalidOperationException("CreatedAt must be set before updating the cart.");
-
-        if (timestamp < CreatedAt)
-            throw new ArgumentException("UpdatedAt cannot be before CreatedAt.", nameof(timestamp));
+        Guard.EnsureUtcNotBefore(timestamp, CreatedAt, nameof(timestamp));
 
         UpdatedAt = timestamp;
     }
