@@ -1,10 +1,10 @@
-namespace Domain.Validations
+namespace Domain.Validations;
+
+/// <summary>
+/// Provides guard clauses for validating method arguments and properties.
+/// </summary>
+public static class Guard
 {
-  /// <summary>
-  /// Provides guard clauses for validating method arguments and properties.
-  /// </summary>
-  public static class Guard
-  {
     /// <summary>
     /// Ensures that a DateTimeOffset value is initialized and in UTC format.
     /// </summary>
@@ -15,11 +15,11 @@ namespace Domain.Validations
     /// </exception>
     public static void EnsureUtc(DateTimeOffset value, string propertyName)
     {
-      if (IsUninitialized(value))
-        throw new ArgumentException("Timestamp is uninitialized.", propertyName);
+        if (IsUninitialized(value))
+            throw new ArgumentException("Timestamp is uninitialized.", propertyName);
 
-      if (value.Offset != TimeSpan.Zero)
-        throw new ArgumentException("Timestamp must be in UTC (offset 00:00).", propertyName);
+        if (value.Offset != TimeSpan.Zero)
+            throw new ArgumentException("Timestamp must be in UTC (offset 00:00).", propertyName);
     }
 
     /// <summary>
@@ -33,12 +33,12 @@ namespace Domain.Validations
     /// </exception>
     public static void EnsureUtcNotBefore(DateTimeOffset value, DateTimeOffset reference, string propertyName)
     {
-      EnsureUtc(value, propertyName); // Ensure the value is in UTC before comparing
+        EnsureUtc(value, propertyName); // Ensure the value is in UTC before comparing
 
-      if (value < reference)
-      {
-        throw new ArgumentException($"The property '{propertyName}' cannot be before {reference}.", propertyName);
-      }
+        if (value < reference)
+        {
+            throw new ArgumentException($"The property '{propertyName}' cannot be before {reference}.", propertyName);
+        }
     }
 
     /// <summary>
@@ -51,10 +51,10 @@ namespace Domain.Validations
     /// </exception>
     public static void EnsureDateOnlyNotFuture(DateOnly value, string propertyName)
     {
-      if (value > DateOnly.FromDateTime(DateTime.UtcNow))
-      {
-        throw new ArgumentException($"The property '{propertyName}' cannot be a future date.", propertyName);
-      }
+        if (value > DateOnly.FromDateTime(DateTime.UtcNow))
+        {
+            throw new ArgumentException($"The property '{propertyName}' cannot be a future date.", propertyName);
+        }
     }
 
     /// <summary>
@@ -67,10 +67,10 @@ namespace Domain.Validations
     /// </exception>
     public static void EnsureStringNotNullOrWhiteSpace(string value, string propertyName)
     {
-      if (string.IsNullOrWhiteSpace(value))
-      {
-        throw new ArgumentException($"The property '{propertyName}' cannot be null or whitespace.", propertyName);
-      }
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            throw new ArgumentException($"The property '{propertyName}' cannot be null or whitespace.", propertyName);
+        }
     }
 
     /// <summary>
@@ -83,15 +83,15 @@ namespace Domain.Validations
     /// </exception>
     public static void EnsureCharInitializedAndNotWhiteSpace(char value, string propertyName)
     {
-      if (IsUninitialized(value))
-      {
-        throw new ArgumentException($"The property '{propertyName}' is uninitialized.", propertyName);
-      }
+        if (IsUninitialized(value))
+        {
+            throw new ArgumentException($"The property '{propertyName}' is uninitialized.", propertyName);
+        }
 
-      if (char.IsWhiteSpace(value))
-      {
-        throw new ArgumentException($"The property '{propertyName}' cannot be whitespace.", propertyName);
-      }
+        if (char.IsWhiteSpace(value))
+        {
+            throw new ArgumentException($"The property '{propertyName}' cannot be whitespace.", propertyName);
+        }
     }
 
     /// <summary>
@@ -104,12 +104,12 @@ namespace Domain.Validations
     /// </exception>
     public static void EnsureUlidNotEmpty(Ulid value, string propertyName)
     {
-      if (IsUninitialized(value))
-      {
-        throw new ArgumentException($"The property '{propertyName}' is uninitialized.", propertyName);
-      }
+        if (IsUninitialized(value))
+        {
+            throw new ArgumentException($"The property '{propertyName}' is uninitialized.", propertyName);
+        }
     }
-    
+
     /// <summary>
     /// Ensures that an object value is not null.
     /// </summary>
@@ -120,13 +120,12 @@ namespace Domain.Validations
     /// </exception>
     public static void EnsureNotNull(Object? value, string propertyName)
     {
-      if(value == null)
-      {
-        throw new ArgumentException($"The property '{propertyName}' cannot be null.", propertyName);
-      }
+        if (value == null)
+        {
+            throw new ArgumentException($"The property '{propertyName}' cannot be null.", propertyName);
+        }
     }
 
     // Check if the value is default and return true if it is
     private static bool IsUninitialized<T>(T value) => EqualityComparer<T>.Default.Equals(value, default);
-  }
 }
