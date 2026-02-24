@@ -1,12 +1,12 @@
 using System.Text.RegularExpressions;
 
-namespace Domain.ValueObjects
+namespace Domain.ValueObjects;
+
+/// <summary>
+/// Represents a phone number value object.
+/// </summary>
+public sealed record PhoneNumber
 {
-  /// <summary>
-  /// Represents a phone number value object.
-  /// </summary>
-  public sealed record PhoneNumber
-  {
     /// <summary>
     /// Regular expression to validate international phone numbers in E.164 format.
     /// </summary>
@@ -35,19 +35,19 @@ namespace Domain.ValueObjects
     /// <exception cref="ArgumentException">Thrown when the phone number is null, empty, or has an invalid format.</exception>
     public static PhoneNumber Create(string value)
     {
-      if (string.IsNullOrWhiteSpace(value))
-        throw new ArgumentException("The phone number is required.", nameof(value));
+        if (string.IsNullOrWhiteSpace(value))
+            throw new ArgumentException("The phone number is required.", nameof(value));
 
-      value = value.Trim();
+        value = value.Trim();
 
-      if (!PhoneNumberRegex.IsMatch(value))
-        throw new ArgumentException("The phone number format is invalid.", nameof(value));
+        if (!PhoneNumberRegex.IsMatch(value))
+            throw new ArgumentException("The phone number format is invalid.", nameof(value));
 
-      // Normalize to always include the Leading '+' sign for consistency, if it's not already present.
-      if (!value.StartsWith("+"))
-        value = "+" + value;
+        // Normalize to always include the Leading '+' sign for consistency, if it's not already present.
+        if (!value.StartsWith("+"))
+            value = "+" + value;
 
-      return new PhoneNumber(value);
+        return new PhoneNumber(value);
     }
 
     /// <summary>
@@ -58,5 +58,4 @@ namespace Domain.ValueObjects
     /// The value is expected to be in E.164 format, which may include a leading '+' sign and up to 15 digits. 
     /// </remarks>
     public override string ToString() => Value;
-  }
 }

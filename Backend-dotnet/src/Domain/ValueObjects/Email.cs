@@ -1,13 +1,13 @@
 using System.Net.Mail;
 
-namespace Domain.ValueObjects
+namespace Domain.ValueObjects;
+
+/// <summary>
+/// Represents an email address as a value object,
+/// ensuring that it is valid and properly formatted according to domain rules.
+/// </summary>
+public sealed record Email
 {
-  /// <summary>
-  /// Represents an email address as a value object,
-  /// ensuring that it is valid and properly formatted according to domain rules.
-  /// </summary>
-  public sealed record Email
-  {
     /// <summary>
     /// Gets the email address value. The value is guaranteed to be a valid email format and is stored in lowercase.
     /// </summary>
@@ -28,32 +28,31 @@ namespace Domain.ValueObjects
     /// <exception cref="ArgumentException">Thrown when the email is null, empty, or not properly formatted.</exception>
     public static Email Create(string value)
     {
-      if (string.IsNullOrWhiteSpace(value))
-        throw new ArgumentException("The email is required.", nameof(value));
+        if (string.IsNullOrWhiteSpace(value))
+            throw new ArgumentException("The email is required.", nameof(value));
 
-      value = value.Trim().ToLowerInvariant();
+        value = value.Trim().ToLowerInvariant();
 
-      if (value.Contains(' '))
-        throw new ArgumentException("The email cannot contain spaces.", nameof(value));
+        if (value.Contains(' '))
+            throw new ArgumentException("The email cannot contain spaces.", nameof(value));
 
-      int at = value.IndexOf('@');
-      if (at <= 0 || at != value.LastIndexOf('@') || at == value.Length - 1)
-        throw new ArgumentException("The email format is invalid.", nameof(value));
+        int at = value.IndexOf('@');
+        if (at <= 0 || at != value.LastIndexOf('@') || at == value.Length - 1)
+            throw new ArgumentException("The email format is invalid.", nameof(value));
 
-      try
-      {
-        var mailAddress = new MailAddress(value);
+        try
+        {
+            var mailAddress = new MailAddress(value);
 
-        // Must match exactly; avoids some odd normalizations.
-        if (mailAddress.Address != value)
-          throw new ArgumentException("The email format is invalid.", nameof(value));
-      }
-      catch (FormatException)
-      {
-        throw new ArgumentException("The email format is invalid.", nameof(value));
-      }
+            // Must match exactly; avoids some odd normalizations.
+            if (mailAddress.Address != value)
+                throw new ArgumentException("The email format is invalid.", nameof(value));
+        }
+        catch (FormatException)
+        {
+            throw new ArgumentException("The email format is invalid.", nameof(value));
+        }
 
-      return new Email(value);
+        return new Email(value);
     }
-  }
 }
