@@ -4,7 +4,7 @@ using Domain.ValueObjects;
 namespace Domain.Entities
 {
   /// <summary>
-  /// Represents a user in the system with properties such as name, contact information, and authentication details.
+  /// Represents an user in the system with properties such as name, contact information, and authentication details.
   /// </summary>
   public class User
   {
