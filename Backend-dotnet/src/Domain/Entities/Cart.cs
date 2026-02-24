@@ -19,19 +19,44 @@ public class Cart
     /// </summary>
     /// <param name="id">The cart identifier.</param>
     /// <param name="userId">The user identifier.</param>
+    /// <param name="createdAt">The timestamp for when the cart was created.</param>
+    /// <param name="updatedAt">The timestamp for when the cart was last updated.</param>
+    private Cart(Ulid id, Ulid userId, DateTimeOffset createdAt, DateTimeOffset updatedAt)
+    {
+        Id = id;
+        UserId = userId;
+        CreatedAt = createdAt;
+        UpdatedAt = updatedAt;
+    }
+
+    /// <summary>
+    /// Creates a new instance of the Cart class with the specified parameters.
+    /// </summary>
+    /// <param name="id">The cart identifier.</param>
+    /// <param name="userId">The user identifier.</param>
     /// <param name="timestamp">The timestamp for when the cart was created.</param>
-    /// <exception cref="ArgumentException">Thrown when the id or userId is empty, or when the timestamp is not in UTC.</exception>
-    public Cart(Ulid id, Ulid userId, DateTimeOffset timestamp)
+    /// <returns>A new instance of the Cart class.</returns>
+    /// <exception cref="ArgumentException">Thrown when the id is empty</exception>
+    /// <exception cref="ArgumentException">Thrown when the userId is empty</exception>
+    /// <exception cref="ArgumentException">Thrown when the timestamp is not in UTC</exception>
+    public static Cart Create
+    (
+        Ulid id,
+        Ulid userId,
+        DateTimeOffset timestamp
+    )
     {
         if (id == Ulid.Empty) throw new ArgumentException("Id is required.", nameof(id));
         if (userId == Ulid.Empty) throw new ArgumentException("User Id is required.", nameof(userId));
 
         Guard.EnsureUtc(timestamp, nameof(timestamp));
 
-        Id = id;
-        UserId = userId;
-        CreatedAt = timestamp;
-        UpdatedAt = timestamp;
+        return new Cart(
+            id, 
+            userId, 
+            createdAt: timestamp,
+            updatedAt: timestamp
+        );
     }
 
     /// <summary>
