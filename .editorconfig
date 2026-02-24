@@ -10,3 +10,10 @@ end_of_line = lf
 
 [*.md]
 trim_trailing_whitespace = false
+
+# Namespace moderno (C# 10+)
+[*.cs]
+indent_style = space
+indent_size = 4
+csharp_style_namespace_declarations = file_scoped:error
+csharp_new_line_before_open_brace = all
