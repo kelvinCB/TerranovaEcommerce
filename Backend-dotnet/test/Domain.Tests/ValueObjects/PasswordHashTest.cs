@@ -2,12 +2,14 @@ using Domain.ValueObjects;
 
 namespace Domain.Tests.ValueObjects;
 
+[Trait("Layer", "Domain")]
 public class PasswordHashTest
 {
     private const int MinimumPasswordHashLength = 64;
 
     [Fact]
-    public void PasswordHash_ShouldCreatePasswordHash_WhenValueIsValid()
+    [Trait("PasswordHash", "From")]
+    public void From_ShouldCreatePasswordHash_WhenValueIsValid()
     {
         // Arrange
         var validPasswordHash = "a".PadLeft(MinimumPasswordHashLength, 'a'); // Create a string of 64 characters
@@ -20,7 +22,8 @@ public class PasswordHashTest
     }
 
     [Fact]
-    public void PasswordHash_ShouldThrowException_WhenValueIsNull()
+    [Trait("PasswordHash", "From")]
+    public void From_ShouldThrowException_WhenValueIsNull()
     {
         // Arrange
         string? passwordHash = default;
@@ -31,7 +34,8 @@ public class PasswordHashTest
     }
 
     [Fact]
-    public void PasswordHash_ShouldThrowException_WhenValueIsNotLongerThan63Characters()
+    [Trait("PasswordHash", "From")]
+    public void From_ShouldThrowException_WhenValueIsNotLongerThan63Characters()
     {
         // Arrange
         var shortPasswordHash = "a".PadLeft(MinimumPasswordHashLength - 1, 'a'); // Create a string of 63 characters
@@ -42,7 +46,8 @@ public class PasswordHashTest
     }
 
     [Fact]
-    public void PasswordHash_ShouldThrowException_WhenValueHasWhitespace()
+    [Trait("PasswordHash", "From")]
+    public void From_ShouldThrowException_WhenValueHasWhitespace()
     {
         // Arrange
         var whitespacePasswordHash = "a a".PadLeft(MinimumPasswordHashLength, 'a'); // Create a string of 64 characters with whitespace
@@ -53,7 +58,8 @@ public class PasswordHashTest
     }
 
     [Fact]
-    public void PasswordHash_ToString_ShouldReturnMaskedValue()
+    [Trait("PasswordHash", "From")]
+    public void From_ToString_ShouldReturnMaskedValue()
     {
         // Arrange
         var validPasswordHash = "a".PadLeft(MinimumPasswordHashLength, 'a'); // Create a string of 64 characters
