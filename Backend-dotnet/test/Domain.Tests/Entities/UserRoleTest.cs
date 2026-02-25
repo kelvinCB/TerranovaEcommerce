@@ -3,7 +3,7 @@ using Domain.Entities;
 namespace Domain.Tests.Entities;
 
 [Trait("Layer", "Domain")]
-public class UserRolesTest
+public class UserRoleTest
 {
     [Fact]
     [Trait("UserRoles", "Create")]
@@ -15,7 +15,7 @@ public class UserRolesTest
         var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
         // Act
-        var userRole = UserRoles.Create(userId, roleId, timestamp);
+        var userRole = UserRole.Create(userId, roleId, timestamp);
 
         // Assert
         Assert.NotNull(userRole);
@@ -34,7 +34,7 @@ public class UserRolesTest
         var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
         // Act and Assert
-        var exception = Assert.Throws<ArgumentException>(() => UserRoles.Create(userId, roleId, timestamp));
+        var exception = Assert.Throws<ArgumentException>(() => UserRole.Create(userId, roleId, timestamp));
 
         Assert.Contains("Is Uninitialized", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -49,7 +49,7 @@ public class UserRolesTest
         var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
         // Act and Assert
-        var exception = Assert.Throws<ArgumentException>(() => UserRoles.Create(userId, roleId, timestamp));
+        var exception = Assert.Throws<ArgumentException>(() => UserRole.Create(userId, roleId, timestamp));
 
         Assert.Contains("Is Uninitialized", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -64,7 +64,7 @@ public class UserRolesTest
         var timestamp = default(DateTimeOffset);
 
         // Act and Assert
-        var exception = Assert.Throws<ArgumentException>(() => UserRoles.Create(userId, roleId, timestamp));
+        var exception = Assert.Throws<ArgumentException>(() => UserRole.Create(userId, roleId, timestamp));
 
         Assert.Contains("Is Uninitialized", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -79,7 +79,7 @@ public class UserRolesTest
         var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4));
 
         // Act and Assert
-        var exception = Assert.Throws<ArgumentException>(() => UserRoles.Create(userId, roleId, timestamp));
+        var exception = Assert.Throws<ArgumentException>(() => UserRole.Create(userId, roleId, timestamp));
 
         Assert.Contains("Must be in UTC", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
