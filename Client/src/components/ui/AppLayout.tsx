@@ -2,6 +2,7 @@ import { Outlet, ScrollRestoration } from "react-router-dom";
 import NavBar from "./NavBar";
 import MobileNavBar from "./MobileNavBar";
 import BurgerMenu from "./BurgerMenu";
+import HelpFeedbackWidget from "@/features/help-feedback/components/HelpFeedbackWidget";
 
 function AppLayout() {
   return (
@@ -13,6 +14,7 @@ function AppLayout() {
         <Outlet />
         <ScrollRestoration />
       </div>
+      <HelpFeedbackWidget />
     </div>
   );
 }
