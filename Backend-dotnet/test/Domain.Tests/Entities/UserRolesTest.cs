@@ -12,7 +12,7 @@ public class UserRolesTest
         // Arrange
         var userId = Ulid.NewUlid();
         var roleId = Ulid.NewUlid();
-        var timestamp = DateTimeOffset.UtcNow;
+        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
         // Act
         var userRole = UserRoles.Create(userId, roleId, timestamp);
@@ -31,7 +31,7 @@ public class UserRolesTest
         // Arrange
         var userId = Ulid.Empty;
         var roleId = Ulid.NewUlid();
-        var timestamp = DateTimeOffset.UtcNow;
+        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
         // Act and Assert
         var exception = Assert.Throws<ArgumentException>(() => UserRoles.Create(userId, roleId, timestamp));
@@ -46,7 +46,7 @@ public class UserRolesTest
         // Arrange
         var userId = Ulid.NewUlid();
         var roleId = Ulid.Empty;
-        var timestamp = DateTimeOffset.UtcNow;
+        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
         // Act and Assert
         var exception = Assert.Throws<ArgumentException>(() => UserRoles.Create(userId, roleId, timestamp));
@@ -76,7 +76,7 @@ public class UserRolesTest
         // Arrange
         var userId = Ulid.NewUlid();
         var roleId = Ulid.NewUlid();
-        var timestamp = DateTimeOffset.Now;
+        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4));
 
         // Act and Assert
         var exception = Assert.Throws<ArgumentException>(() => UserRoles.Create(userId, roleId, timestamp));
