@@ -12,6 +12,7 @@ This guide provides comprehensive documentation for frontend development in the 
 - [State Management](#state-management)
 - [Styling Guidelines](#styling-guidelines)
 - [Routing and Navigation](#routing-and-navigation)
+- [Help & Feedback Module](#help--feedback-module)
 - [Testing Guidelines](#testing-guidelines)
 - [Performance Optimization](#performance-optimization)
 - [Accessibility Standards](#accessibility-standards)
@@ -186,7 +187,54 @@ export const ComponentName: React.FC<ComponentNameProps> = ({
   - Integrates Navbar and BurgerMenu
   - Provides consistent layout structure
   - Renders child routes via `<Outlet />`
+  - Mounts the Help & Feedback floating widget globally
 - **Location**: `src/components/ui/AppLayout.tsx`
+
+---
+
+## Help & Feedback Module
+
+### What it does
+
+The Help & Feedback module provides a floating support entry point available across the app. It combines:
+
+- **FAQ tab** for quick self-service answers
+- **Bug Report tab** with validated form submission
+- **Feature Suggestion tab** with validated form submission
+
+This module is implemented as `HelpFeedbackWidget` and is rendered in `AppLayout`, so users can open it from any page.
+
+### Location and structure
+
+```text
+Client/src/features/help-feedback/
+├── api/helpFeedbackService.ts
+├── components/HelpFeedbackWidget.tsx
+├── hooks/useHelpFeedbackSubmission.ts
+└── types.ts
+```
+
+### Interaction model
+
+- Opens from a floating action button (`aria-label="Open help and feedback"`)
+- Displays a right-side panel with tabbed content
+- Uses `react-hook-form` for client-side validation
+- Uses `@tanstack/react-query` mutation for submit states (`pending`, `success`, `error`)
+
+### API integration
+
+The widget submits to these endpoints:
+
+- `POST /api/help-feedback/bug-report`
+- `POST /api/help-feedback/feature-suggestion`
+
+Implementation detail: endpoint mapping lives in `helpFeedbackService.ts` (`HELP_FEEDBACK_ENDPOINTS`).
+
+### Accessibility notes
+
+- Dialog semantics: `role="dialog"`, `aria-modal="true"`
+- Tab controls include `role="tab"` and selection state via `aria-selected`
+- Form fields are label-associated (`htmlFor` / `id`) and queryable by accessible names in tests
 
 ---
 
