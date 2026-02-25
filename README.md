@@ -2,6 +2,12 @@
 
 A modern e-commerce platform built with React, TypeScript, and Vite.
 
+## ✨ Frontend Highlights
+
+- Global **Help & Feedback** widget available across all pages
+- In-panel **FAQ**, **Bug Report**, and **Feature Suggestion** tabs
+- Form submission flow integrated with React Query mutations and API endpoints
+
 ## 🚀 Technologies
 
 - **Frontend**: React 19, Vite 6, Tailwind CSS 4
