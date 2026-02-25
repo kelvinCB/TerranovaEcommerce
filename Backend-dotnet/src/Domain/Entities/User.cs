@@ -8,6 +8,10 @@ namespace Domain.Entities;
 /// </summary>
 public class User
 {
+    // Fields
+    private readonly List<Ulid> _roleIds = [];
+
+    // Properties
     public Ulid Id { get; private set; }
     public string FirstName { get; private set; } = null!;
     public string LastName { get; private set; } = null!;
@@ -20,6 +24,9 @@ public class User
     public DateTimeOffset UpdatedAt { get; private set; }
     public Email EmailAddress { get; private set; } = null!;
     public bool IsDeleted { get; private set; }
+
+    // Collections properties
+    public IReadOnlyCollection<Ulid> RoleIds => _roleIds.AsReadOnly(); // Roles assigned to the user
 
     /// <summary>
     /// Initializes a new instance of the User class with the specified parameters.
@@ -235,6 +242,46 @@ public class User
         Guard.EnsureUtcNotBefore(timestamp, CreatedAt, nameof(timestamp));
 
         BirthDate = birthDate;
+        UpdatedAt = timestamp;
+    }
+
+    /// <summary>
+    /// Assigns a role to the user.
+    /// </summary>
+    /// <param name="roleId">The role identifier.</param>
+    /// <param name="timestamp">The timestamp in UTC when the role was assigned.</param>
+    public void AssignRole(Ulid roleId, DateTimeOffset timestamp)
+    {
+        Guard.EnsureUlidNotEmpty(roleId, nameof(roleId));
+        Guard.EnsureUtc(timestamp, nameof(timestamp));
+        Guard.EnsureUtcNotBefore(timestamp, CreatedAt, nameof(timestamp));
+
+        if (_roleIds.Contains(roleId))
+        {
+            throw new ArgumentException($"The property '{nameof(roleId)}' is already assigned.", nameof(roleId));
+        }
+
+        _roleIds.Add(roleId);
+        UpdatedAt = timestamp;
+    }
+
+    /// <summary>
+    /// Removes a role from the user.
+    /// </summary>
+    /// <param name="roleId">The role identifier.</param>
+    /// <param name="timestamp">The timestamp in UTC when the role was removed.</param>
+    public void RemoveRole(Ulid roleId, DateTimeOffset timestamp)
+    {
+        Guard.EnsureUlidNotEmpty(roleId, nameof(roleId));
+        Guard.EnsureUtc(timestamp, nameof(timestamp));
+        Guard.EnsureUtcNotBefore(timestamp, CreatedAt, nameof(timestamp));
+
+        if (_roleIds.Contains(roleId) == false)
+        {
+            throw new ArgumentException($"The property '{nameof(roleId)}' is not assigned.", nameof(roleId));
+        }
+
+        _roleIds.Remove(roleId);
         UpdatedAt = timestamp;
     }
 
