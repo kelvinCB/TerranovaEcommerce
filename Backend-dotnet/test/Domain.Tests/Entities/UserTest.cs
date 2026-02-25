@@ -541,7 +541,7 @@ public class UserTest
         // Arrange
         var user = UserTestFactory.CreateUser();
         var newPasswordHash = PasswordHash.From(new String('b', 64));
-        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(4)); // Its not UTC
+        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(4)); // It's not UTC
 
         // Act and Assert
         var exception = Assert.Throws<ArgumentException>(() => user.SetPasswordHash(newPasswordHash, timestamp));
@@ -599,7 +599,7 @@ public class UserTest
     {
         // Arrange
         var user = UserTestFactory.CreateUser();
-        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4)); // Its not UTC.
+        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4)); // It's not UTC.
 
         // Act and Assert
         var exception = Assert.Throws<ArgumentException>(() => user.SetIsActive(false, timestamp));
@@ -657,7 +657,7 @@ public class UserTest
     {
         // Arrange
         var user = UserTestFactory.CreateUser();
-        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4)); // Its not UTC
+        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4)); // It's not UTC
 
         // Act and Assert
         var exception = Assert.Throws<ArgumentException>(() => user.SetIsDeleted(true, timestamp));
@@ -733,7 +733,7 @@ public class UserTest
         // Arrange
         var user = UserTestFactory.CreateUser();
         var newEmailAddress = Email.Create("example@test.com");
-        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4)); // Its not UTC
+        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4)); // It's not UTC
 
         // Act and Assert
         var exception = Assert.Throws<ArgumentException>(() => user.SetEmailAddress(newEmailAddress, timestamp));
@@ -812,7 +812,7 @@ public class UserTest
         // Arrange
         var user = UserTestFactory.CreateUser();
         var newPhoneNumber = PhoneNumber.Create("+8292226161");
-        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4)); // Its not UTC
+        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4)); // It's not UTC
 
         // Act and Assert
         var exception = Assert.Throws<ArgumentException>(() => user.SetPhoneNumber(newPhoneNumber, timestamp));
@@ -858,7 +858,7 @@ public class UserTest
     {
         // Arrange
         var user = UserTestFactory.CreateUser();
-        var newBirthDate = DateOnly.FromDateTime(DateTime.Now).AddDays(1); // new birth date set for tomorrow
+        var newBirthDate = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(1); // new birth date set for tomorrow
         var timestamp = user.CreatedAt.AddMinutes(1);
 
         // Act and Assert
@@ -889,7 +889,7 @@ public class UserTest
         // Arrange
         var user = UserTestFactory.CreateUser();
         var newBirthDate = user.BirthDate.AddYears(-1);
-        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4)); // Its not UTC
+        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4)); // It's not UTC
 
         // Act and Assert
         var exception = Assert.Throws<ArgumentException>(() => user.SetBirthDate(newBirthDate, timestamp));
@@ -983,7 +983,7 @@ public class UserTest
         // Arrange
         var user = UserTestFactory.CreateUser();
         var roleId = Ulid.NewUlid();
-        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4)); // Its not UTC
+        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4)); // It's not UTC
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(() => user.AssignRole(roleId, timestamp));
@@ -1077,7 +1077,7 @@ public class UserTest
         // Arrange
         var user = UserTestFactory.CreateUser();
         var roleId = Ulid.NewUlid();
-        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4)); // Its not UTC
+        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4)); // It's not UTC
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(() => user.RemoveRole(roleId, timestamp));

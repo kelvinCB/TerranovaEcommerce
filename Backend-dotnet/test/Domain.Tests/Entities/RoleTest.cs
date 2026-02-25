@@ -82,7 +82,7 @@ public class RoleTest
         var id = Ulid.NewUlid();
         var name = "Admin";
         var description = "Administrator role";
-        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4)); // Ist not UTC
+        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4)); // It's not UTC
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(() => Role.Create(id, name, description, timestamp));
