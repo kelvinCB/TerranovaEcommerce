@@ -100,6 +100,46 @@ describe("HelpFeedbackWidget", () => {
     ).toBeInTheDocument();
   });
 
+  it("submits feature suggestion to the right endpoint and resets form", async () => {
+    (fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({ success: true }),
+    });
+
+    renderWithProviders();
+    fireEvent.click(screen.getByLabelText("Open help and feedback"));
+    fireEvent.click(screen.getByRole("tab", { name: "Feature Suggestion" }));
+
+    fireEvent.change(screen.getByLabelText("Nombre"), {
+      target: { value: "Kelvin" },
+    });
+    fireEvent.change(screen.getByLabelText("Email"), {
+      target: { value: "kelvin@mail.com" },
+    });
+    fireEvent.change(screen.getByLabelText("Número de orden (opcional)"), {
+      target: { value: "ORD-1001" },
+    });
+    fireEvent.change(screen.getByLabelText("Describe tu sugerencia"), {
+      target: { value: "Agregar atajos para recompra desde historial." },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Enviar" }));
+
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledWith(
+        "/api/help-feedback/feature-suggestion",
+        expect.objectContaining({ method: "POST" }),
+      );
+    });
+
+    await screen.findByText("¡Recibimos tu mensaje! Te responderemos pronto.");
+
+    expect(screen.getByLabelText("Nombre")).toHaveValue("");
+    expect(screen.getByLabelText("Email")).toHaveValue("");
+    expect(screen.getByLabelText("Número de orden (opcional)")).toHaveValue("");
+    expect(screen.getByLabelText("Describe tu sugerencia")).toHaveValue("");
+  });
+
   it("shows loading and error states during submit", async () => {
     (fetch as unknown as ReturnType<typeof vi.fn>).mockImplementation(
       () =>
