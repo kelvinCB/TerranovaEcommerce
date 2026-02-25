@@ -912,4 +912,177 @@ public class UserTest
         Assert.Contains("Cannot be before", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
+    [Fact]
+    [Trait("User", "AssignRole")]
+    public void AssignRole_ShouldAssignRole_WhenParametersAreValid()
+    {
+        // Arrange
+        var user = UserTestFactory.CreateUser();
+        var roleId = Ulid.NewUlid();
+        var timestamp = user.UpdatedAt.AddMinutes(1);
+
+        // Act
+        user.AssignRole(roleId, timestamp);
+
+        // Assert
+        Assert.Contains(roleId, user.RoleIds);
+        Assert.Equal(timestamp, user.UpdatedAt);
+    }
+
+    [Fact]
+    [Trait("User", "AssignRole")]
+    public void AssignRole_ShouldThrowException_WhenRoleAlreadyAssigned()
+    {
+        // Arrange
+        var user = UserTestFactory.CreateUser();
+        var roleId = Ulid.NewUlid();
+        var firstTimestamp = user.UpdatedAt.AddMinutes(1);
+        var secondTimestamp = user.UpdatedAt.AddMinutes(2);
+        user.AssignRole(roleId, firstTimestamp);
+
+        // Act
+        var exception = Assert.Throws<ArgumentException>(() => user.AssignRole(roleId, secondTimestamp));
+
+        // Assert
+        Assert.Contains("Already assigned", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    [Trait("User", "AssignRole")]
+    public void AssignRole_ShouldThrowException_WhenRoleIdIsEmpty()
+    {
+        // Arrange
+        var user = UserTestFactory.CreateUser();
+        var timestamp = user.UpdatedAt.AddMinutes(1);
+
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentException>(() => user.AssignRole(Ulid.Empty, timestamp));
+
+        Assert.Contains("Is Uninitialized", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    [Trait("User", "AssignRole")]
+    public void AssignRole_ShouldThrowException_WhenTimestampIsUninitialized()
+    {
+        // Arrange
+        var user = UserTestFactory.CreateUser();
+        var roleId = Ulid.NewUlid();
+        var timestamp = default(DateTimeOffset);
+
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentException>(() => user.AssignRole(roleId, timestamp));
+
+        Assert.Contains("Is Uninitialized", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    [Trait("User", "AssignRole")]
+    public void AssignRole_ShouldThrowException_WhenTimestampIsNotUtc()
+    {
+        // Arrange
+        var user = UserTestFactory.CreateUser();
+        var roleId = Ulid.NewUlid();
+        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4)); // Its not UTC
+
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentException>(() => user.AssignRole(roleId, timestamp));
+
+        Assert.Contains("Must be in UTC", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    [Trait("User", "AssignRole")]
+    public void AssignRole_ShouldThrowException_WhenTimestampIsBeforeUpdatedAt()
+    {
+        // Arrange
+        var user = UserTestFactory.CreateUser();
+        var roleId = Ulid.NewUlid();
+        var timestamp = user.UpdatedAt.AddMinutes(-1);
+
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentException>(() => user.AssignRole(roleId, timestamp));
+
+        Assert.Contains("Cannot be before", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    [Trait("User", "RemoveRole")]
+    public void RemoveRole_ShouldRemoveRole_WhenRoleIsAssigned()
+    {
+        // Arrange
+        var user = UserTestFactory.CreateUser();
+        var roleId = Ulid.NewUlid();
+        var assignTimestamp = user.UpdatedAt.AddMinutes(1);
+        var removeTimestamp = user.UpdatedAt.AddMinutes(2);
+        user.AssignRole(roleId, assignTimestamp);
+
+        // Act
+        user.RemoveRole(roleId, removeTimestamp);
+
+        // Assert
+        Assert.DoesNotContain(roleId, user.RoleIds);
+        Assert.Equal(removeTimestamp, user.UpdatedAt);
+    }
+
+    [Fact]
+    [Trait("User", "RemoveRole")]
+    public void RemoveRole_ShouldThrowException_WhenRoleIsNotAssigned()
+    {
+        // Arrange
+        var user = UserTestFactory.CreateUser();
+        var roleId = Ulid.NewUlid();
+        var timestamp = user.UpdatedAt.AddMinutes(1);
+
+        // Act
+        var exception = Assert.Throws<ArgumentException>(() => user.RemoveRole(roleId, timestamp));
+
+        // Assert
+        Assert.Contains("not assigned", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    [Trait("User", "RemoveRole")]
+    public void RemoveRole_ShouldThrowException_WhenRoleIdIsEmpty()
+    {
+        // Arrange
+        var user = UserTestFactory.CreateUser();
+        var timestamp = user.UpdatedAt.AddMinutes(1);
+
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentException>(() => user.RemoveRole(Ulid.Empty, timestamp));
+
+        Assert.Contains("Is Uninitialized", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    [Trait("User", "RemoveRole")]
+    public void RemoveRole_ShouldThrowException_WhenTimestampIsUninitialized()
+    {
+        // Arrange
+        var user = UserTestFactory.CreateUser();
+        var roleId = Ulid.NewUlid();
+        var timestamp = default(DateTimeOffset);
+
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentException>(() => user.RemoveRole(roleId, timestamp));
+
+        Assert.Contains("Is Uninitialized", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    [Trait("User", "RemoveRole")]
+    public void RemoveRole_ShouldThrowException_WhenTimestampIsNotUtc()
+    {
+        // Arrange
+        var user = UserTestFactory.CreateUser();
+        var roleId = Ulid.NewUlid();
+        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4)); // Its not UTC
+
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentException>(() => user.RemoveRole(roleId, timestamp));
+
+        Assert.Contains("Must be in UTC", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
 }
