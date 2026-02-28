@@ -525,11 +525,9 @@ ALTER TABLE terranova.users DROP CONSTRAINT IF EXISTS chk_users_gender_valid;
 ALTER TABLE terranova.users ADD CONSTRAINT chk_users_gender_valid CHECK (gender IS NULL OR gender IN ('M', 'F', 'O'));
 
 -- refresh_tokens
-ALTER TABLE terranova.refresh_tokens DROP CONSTRAINT IF EXISTS uq_refresh_tokens_jti;
-CREATE UNIQUE INDEX uq_refresh_tokens_jti ON terranova.refresh_tokens (jti) WHERE jti IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_refresh_tokens_jti ON terranova.refresh_tokens (jti) WHERE jti IS NOT NULL;
 
-ALTER TABLE terranova.refresh_tokens DROP CONSTRAINT IF EXISTS uq_refresh_tokens_user_not_revoked;
-CREATE UNIQUE INDEX uq_refresh_tokens_user_not_revoked ON terranova.refresh_tokens (user_id) WHERE is_revoked = FALSE;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_refresh_tokens_user_not_revoked ON terranova.refresh_tokens (user_id) WHERE is_revoked = FALSE;
 
 -- 5. Funcciones/Functions
 
