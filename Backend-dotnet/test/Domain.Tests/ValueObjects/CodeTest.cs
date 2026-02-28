@@ -17,7 +17,7 @@ public class CodeTest
 
         // Assert
         Assert.NotNull(code);
-        Assert.Equal(validCode, code.Value);
+        Assert.True(code.IsMatch(validCode));
     }
 
     [Fact]
