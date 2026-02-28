@@ -61,10 +61,7 @@ public sealed record PasswordHash
     /// <example>"p@ssTest 123 4" is an example of a password hash that contains whitespace and would be considered invalid.</example>
     private static void EnsurePasswordHashNotContainsWhitespace(string hash)
     {
-        for (int i = 0; i < hash.Length; i++)
-        {
-            if (char.IsWhiteSpace(hash[i]))
-                throw new ArgumentException("Password hash cannot contain whitespace characters.", nameof(hash));
-        }
+        if (hash.Any(char.IsWhiteSpace))
+            throw new ArgumentException("Password hash cannot contain whitespace characters.", nameof(hash));
     }
 }
