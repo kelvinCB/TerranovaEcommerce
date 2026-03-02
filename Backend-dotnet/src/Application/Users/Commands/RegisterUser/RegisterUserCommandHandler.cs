@@ -18,22 +18,26 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHasher _passwordHasher;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IIdGenerator _idGenerator;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RegisterUserCommandHandler"/> class.
     /// </summary>
     /// <param name="userRepository">The user repository.</param>
     /// <param name="passwordHasher">The password hasher service.</param>
-    /// <param name="dateTimeProvider">The date time provider service.</param>
+    /// <param name="dateTimeProvider">The date-time provider service.</param>
+    /// <param name="idGenerator">The ID generator service.</param>
     public RegisterUserCommandHandler(
         IUserRepository userRepository,
         IPasswordHasher passwordHasher,
-        IDateTimeProvider dateTimeProvider
+        IDateTimeProvider dateTimeProvider,
+        IIdGenerator idGenerator
     )
     {
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         _passwordHasher = passwordHasher ?? throw new ArgumentNullException(nameof(passwordHasher));
         _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
+        _idGenerator = idGenerator ?? throw new ArgumentNullException(nameof(idGenerator));
     }
 
     /// <summary>
@@ -47,16 +51,16 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
     {
         var email = Email.Create(request.Email);
 
-        var phoneNumber = default(PhoneNumber);
-        if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
-        {
-            phoneNumber = PhoneNumber.Create(request.PhoneNumber);
-        }
-
         var userExists = await _userRepository.ExistsByEmailAsync(email, cancellationToken);
         if (userExists)
         {
             throw new EmailAlreadyInUseException(email.Value);
+        }
+
+        var phoneNumber = default(PhoneNumber);
+        if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
+        {
+            phoneNumber = PhoneNumber.Create(request.PhoneNumber);
         }
         
         var passwordHash = PasswordHash.From(
@@ -65,8 +69,10 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
 
         var timestamp = _dateTimeProvider.Timestamp;
 
+        var id = _idGenerator.NewUlid();
+
         var user = User.Create(
-            id: Ulid.NewUlid(),
+            id: id,
             firstName: request.FirstName,
             lastName: request.LastName,
             birthDate: request.BirthDate,

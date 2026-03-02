@@ -17,7 +17,7 @@ namespace Application.Users.Commands.RegisterUser;
 public sealed record RegisterUserCommand(
     string FirstName,
     string LastName,
-    string PhoneNumber,
+    string? PhoneNumber,
     DateOnly BirthDate,
     char Gender,
     string Password,
