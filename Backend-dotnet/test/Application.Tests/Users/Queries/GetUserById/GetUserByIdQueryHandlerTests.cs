@@ -10,7 +10,7 @@ namespace Application.Tests.Users.Queries.GetUserById;
 public sealed class GetUserByIdQueryHandlerTests
 {
     [Fact]
-    [Trait("Users", "GetUserByIdQueryHandler")]
+    [Trait("Users", "Queries/GetUserByIdQueryHandler/Constructor")]
     public void Constructor_ShouldInitialize_WithValidRepository()
     {
         // Act and Assert
@@ -20,7 +20,7 @@ public sealed class GetUserByIdQueryHandlerTests
     }
 
     [Fact]
-    [Trait("Users", "GetUserByIdQueryHandler")]
+    [Trait("Users", "Queries/GetUserByIdQueryHandler/Constructor")]
     public void Constructor_ShouldThrowException_WhenUserRepositoryIsNull()
     {
         // Act and Assert
@@ -28,8 +28,8 @@ public sealed class GetUserByIdQueryHandlerTests
     }
 
     [Fact]
-    [Trait("Users", "GetUserByIdQueryHandler")]
-    public async Task Handler_ShouldReturnUser_WhenUserExists()
+    [Trait("Users", "Queries/GetUserByIdQueryHandler/Handle")]
+    public async Task Handle_ShouldReturnUser_WhenUserExists()
     {
         // Arrange
         var user = User.Create(
@@ -73,8 +73,8 @@ public sealed class GetUserByIdQueryHandlerTests
     }
 
     [Fact]
-    [Trait("Users", "GetUserByIdQueryHandler")]
-    public async Task Handler_ShouldReturnNull_WhenUserDoesNotExist()
+    [Trait("Users", "Queries/GetUserByIdQueryHandler/Handle")]
+    public async Task Handle_ShouldReturnNull_WhenUserDoesNotExist()
     {
         // Arrange
         var user = User.Create(
