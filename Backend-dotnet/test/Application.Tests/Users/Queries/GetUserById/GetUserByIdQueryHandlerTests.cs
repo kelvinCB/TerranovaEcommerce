@@ -1,5 +1,7 @@
 using Application.Users.Queries.GetUserById;
 using Application.Common.Abstractions.Persistence;
+using Domain.Entities;
+using Domain.ValueObjects;
 using Moq;
 
 namespace Application.Tests.Users.Queries.GetUserById;
@@ -22,7 +24,7 @@ public sealed class GetUserByIdQueryHandlerTests
     public void Constructor_ShouldThrowException_WhenUserRepositoryIsNull()
     {
         // Act and Assert
-        var excepcion = Assert.Throws<ArgumentNullException>(() => new GetUserByIdQueryHandler(null!));
+        Assert.Throws<ArgumentNullException>(() => new GetUserByIdQueryHandler(default!)); // Force non-nullable for testing
     }
 
     [Fact]
@@ -30,16 +32,16 @@ public sealed class GetUserByIdQueryHandlerTests
     public async Task Handler_ShouldReturnUser_WhenUserExists()
     {
         // Arrange
-        var user = Domain.Entities.User.Create(
+        var user = User.Create(
             Ulid.NewUlid(),
             "Briangel",
             "Santana Calcanio",
             new DateOnly(2001, 1, 1),
             'M',
-            Domain.ValueObjects.PasswordHash.From(new String('a', 64)),
+            PasswordHash.From(new String('a', 64)),
             new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero),
-            Domain.ValueObjects.Email.Create("test@example.com"),
-            Domain.ValueObjects.PhoneNumber.Create("+18298881212")
+            Email.Create("test@example.com"),
+            PhoneNumber.Create("+18298881212")
         );
 
         var mockUserRepository = new Mock<IUserRepository>();
@@ -75,23 +77,23 @@ public sealed class GetUserByIdQueryHandlerTests
     public async Task Handler_ShouldReturnNull_WhenUserDoesNotExist()
     {
         // Arrange
-        var user = Domain.Entities.User.Create(
+        var user = User.Create(
             Ulid.NewUlid(),
             "Briangel",
             "Santana Calcanio",
             new DateOnly(2001, 1, 1),
             'M',
-            Domain.ValueObjects.PasswordHash.From(new String('a', 64)),
+            PasswordHash.From(new String('a', 64)),
             new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero),
-            Domain.ValueObjects.Email.Create("test@example.com"),
-            Domain.ValueObjects.PhoneNumber.Create("+18298881212")
+            Email.Create("test@example.com"),
+            PhoneNumber.Create("+18298881212")
         );
 
         var mockUserRepository = new Mock<IUserRepository>();
 
         mockUserRepository
             .Setup(x => x.GetByIdAsync(It.IsAny<Ulid>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((Domain.Entities.User?)null);
+            .ReturnsAsync((User?)null);
 
         var handler = new GetUserByIdQueryHandler(mockUserRepository.Object);
 
