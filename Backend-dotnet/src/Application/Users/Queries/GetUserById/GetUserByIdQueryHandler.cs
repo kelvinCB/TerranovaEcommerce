@@ -13,9 +13,14 @@ public sealed class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, 
     // Dependency injection
     private readonly IUserRepository _userRepository;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GetUserByIdQueryHandler"/> class.
+    /// </summary>
+    /// <param name="userRepository">The user repository.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the user repository is null.</exception>
     public GetUserByIdQueryHandler(IUserRepository userRepository)
     {
-        _userRepository = userRepository;
+        _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
     }
 
     /// <summary>
