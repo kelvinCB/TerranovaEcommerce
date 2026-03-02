@@ -10,7 +10,7 @@ namespace Application.Tests.Users.Queries.GetUserByEmail;
 public sealed class GetUserByEmailQueryHandlerTests
 {
     [Fact]
-    [Trait("Users", "GetUserByEmailQueryHandler")]
+    [Trait("Users", "Queries/GetUserByEmailQueryHandler/Constructor")]
     public void Constructur_ShouldInitialize_WithValidRepository()
     {
         // Act and Assert
@@ -20,7 +20,7 @@ public sealed class GetUserByEmailQueryHandlerTests
     }
 
     [Fact]
-    [Trait("Users", "GetUserByEmailQueryHandler")]
+    [Trait("Users", "Queries/GetUserByEmailQueryHandler/Constructor")]
     public void Constructor_ShouldThrowException_WhenUserRepositoryIsNull()
     {
         // Act and Assert
@@ -28,8 +28,8 @@ public sealed class GetUserByEmailQueryHandlerTests
     }
 
     [Fact]
-    [Trait("Users", "GetUserByEmailQueryHandler")]
-    public async Task Handler_ShouldReturnUser_WhenUserExists()
+    [Trait("Users", "Queries/GetUserByEmailQueryHandler/Handle")]
+    public async Task Handle_ShouldReturnUser_WhenUserExists()
     {
         // Arrange
         var user = User.Create(
@@ -72,8 +72,8 @@ public sealed class GetUserByEmailQueryHandlerTests
     }
 
     [Fact]
-    [Trait("Users", "GetUserByEmailQueryHandler")]
-    public async Task Handler_ShouldReturnNull_WhenUserDoesNotExist()
+    [Trait("Users", "Queries/GetUserByEmailQueryHandler/Handle")]
+    public async Task Handle_ShouldReturnNull_WhenUserDoesNotExist()
     {
         var mockUserRepository = new Mock<IUserRepository>();
         mockUserRepository
