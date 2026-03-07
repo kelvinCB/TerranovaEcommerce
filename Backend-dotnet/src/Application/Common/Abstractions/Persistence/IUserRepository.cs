@@ -62,12 +62,12 @@ public interface IUserRepository
     /// </summary>
     /// <param name="id">The unique identifier of the user to deactivate.</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
-    Task DesactivateAsync(Ulid id, CancellationToken cancellationToken = default);
+    Task DeactivateAsync(Ulid id, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Activates a user from the repository.
     /// </summary>
-    /// <param name="id">The unique identifier of the user to activate</param>
-    /// <param name="cancellationToken">A cancellation token to cancel the operation</param>
+    /// <param name="id">The unique identifier of the user to activate.</param>
+    /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     Task ActivateAsync(Ulid id, CancellationToken cancellationToken = default);
 }
