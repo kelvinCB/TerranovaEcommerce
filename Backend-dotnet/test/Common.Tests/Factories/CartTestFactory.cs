@@ -1,6 +1,6 @@
 using Domain.Entities;
 
-namespace Domain.Tests.Factories;
+namespace Common.Tests.Factories;
 
 public static class CartTestFactory
 {

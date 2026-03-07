@@ -56,4 +56,18 @@ public interface IUserRepository
     /// <param name="id">The unique identifier of the user to delete.</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     Task SoftDeleteAsync(Ulid id, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Deactivates a user from the repository.
+    /// </summary>
+    /// <param name="id">The unique identifier of the user to deactivate.</param>
+    /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+    Task DeactivateAsync(Ulid id, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Activates a user from the repository.
+    /// </summary>
+    /// <param name="id">The unique identifier of the user to activate.</param>
+    /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+    Task ActivateAsync(Ulid id, CancellationToken cancellationToken = default);
 }

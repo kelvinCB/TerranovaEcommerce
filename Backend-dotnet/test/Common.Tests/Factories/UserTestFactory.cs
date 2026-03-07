@@ -1,7 +1,7 @@
 using Domain.Entities;
 using Domain.ValueObjects;
 
-namespace Domain.Tests.Factories;
+namespace Common.Tests.Factories;
 
 public static class UserTestFactory
 {
