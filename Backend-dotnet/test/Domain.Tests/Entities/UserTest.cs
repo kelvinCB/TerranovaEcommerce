@@ -1,6 +1,6 @@
 using Domain.Entities;
 using Domain.ValueObjects;
-using Domain.Tests.Factories;
+using Common.Tests.Factories;
 
 namespace Domain.Tests.Entities;
 

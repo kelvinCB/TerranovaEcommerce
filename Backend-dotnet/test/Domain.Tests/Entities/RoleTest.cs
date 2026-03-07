@@ -1,5 +1,5 @@
 using Domain.Entities;
-using Domain.Tests.Factories;
+using Common.Tests.Factories;
 
 namespace Domain.Tests.Entities;
 
