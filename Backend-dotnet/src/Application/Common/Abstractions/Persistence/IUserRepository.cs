@@ -58,16 +58,9 @@ public interface IUserRepository
     Task SoftDeleteAsync(User user, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Deactivates a user from the repository.
+    /// Activates or deactivates a user in the repository based on their activation status.
     /// </summary>
-    /// <param name="user">The user to deactivate.</param>
+    /// <param name="user">The user to activate or deactivate.</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
-    Task DeactivateAsync(User user, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Activates a user from the repository.
-    /// </summary>
-    /// <param name="user">The user to activate.</param>
-    /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
-    Task ActivateAsync(User user, CancellationToken cancellationToken = default);
+    Task SetIsActiveAsync(User user, CancellationToken cancellationToken = default);
 }
