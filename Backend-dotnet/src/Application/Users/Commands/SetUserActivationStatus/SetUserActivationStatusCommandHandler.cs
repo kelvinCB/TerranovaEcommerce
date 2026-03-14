@@ -38,6 +38,11 @@ public sealed class SetUserActivationStatusCommandHandler : IRequestHandler<SetU
       throw new UserNotFoundException(request.Id);
     }
 
+    if(user.IsDeleted)
+    {
+      throw new UserAlreadyDeletedException(request.Id);
+    }
+
     if(user.IsActive == request.IsActive)
     {
       throw new UserActivationStatusNotChangedException(request.Id);
