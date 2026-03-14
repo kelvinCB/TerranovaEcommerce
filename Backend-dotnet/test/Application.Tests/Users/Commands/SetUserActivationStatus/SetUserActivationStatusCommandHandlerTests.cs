@@ -126,6 +126,44 @@ public sealed class SetUserActivationStatusCommandHandlerTests
 
   [Fact]
   [Trait("Users", "Commands/SetUserActivationStatusCommandHandler/Handle")]
+  public async Task Handle_ShouldThrowException_WhenUserIsDeleted()
+  {
+    // Arrange
+    var user = UserTestFactory.CreateUser();
+    user.SetIsDeleted(true, new DateTimeOffset(2026, 1, 2, 0, 0, 0, TimeSpan.Zero)); // Deleted 2 Days from creation date
+
+    var mockUserRepository = new Mock<IUserRepository>();
+    var mockDateTimeProvider = new Mock<IDateTimeProvider>();
+
+    mockUserRepository
+      .Setup(x => x.GetByIdAsync(It.IsAny<Ulid>(), It.IsAny<CancellationToken>()))
+      .ReturnsAsync(user);
+
+    mockUserRepository
+      .Setup(x => x.SetIsActiveAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()))
+      .Returns(Task.CompletedTask);
+
+    mockDateTimeProvider
+      .Setup(x => x.Timestamp)
+      .Returns(new DateTimeOffset(2026, 1, 2, 0, 0, 0, TimeSpan.Zero)); // 2 Days from creation date
+
+    var handler = new SetUserActivationStatusCommandHandler(mockUserRepository.Object, mockDateTimeProvider.Object);
+
+    var command = new SetUserActivationStatusCommand(user.Id, false);
+
+    // Act and Assert
+    var exception = await Assert.ThrowsAsync<UserAlreadyDeletedException>(() => handler.Handle(command, CancellationToken.None));
+
+    mockUserRepository.Verify(x => x.GetByIdAsync(It.IsAny<Ulid>(), It.IsAny<CancellationToken>()), Times.Once);
+    mockDateTimeProvider.Verify(x => x.Timestamp, Times.Never);
+    mockUserRepository.Verify(x => x.SetIsActiveAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Never);
+
+    Assert.NotNull(exception);
+    Assert.IsType<UserAlreadyDeletedException>(exception);
+  }
+
+  [Fact]
+  [Trait("Users", "Commands/SetUserActivationStatusCommandHandler/Handle")]
   public async Task Handle_ShouldThrowException_WhenUserActivationStatusNotChanged()
   {
     // Arrange
