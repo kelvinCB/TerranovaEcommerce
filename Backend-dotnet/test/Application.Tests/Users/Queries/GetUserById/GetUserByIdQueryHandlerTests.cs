@@ -126,6 +126,33 @@ public sealed class GetUserByIdQueryHandlerTests
 
     [Fact]
     [Trait("Users", "Queries/GetUserByIdQueryHandler/Handle")]
+    public async Task Handle_ShouldThrowException_WhenUserIsDeleted()
+    {
+        // Arrange
+        var user = UserTestFactory.CreateUser();
+
+        user.SetIsDeleted(true, new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero)); // Deleted 1 Day from creation date
+
+        var mockUserRepository = new Mock<IUserRepository>();
+        var mockRoleRepository = new Mock<IRoleRepository>();
+
+        mockUserRepository
+            .Setup(x => x.GetByIdAsync(It.IsAny<Ulid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+
+        var handler = new GetUserByIdQueryHandler(mockUserRepository.Object, mockRoleRepository.Object);
+
+        // Act & Assert
+        var result = await handler.Handle(new GetUserByIdQuery(user.Id), CancellationToken.None);
+
+        mockUserRepository.Verify(x => x.GetByIdAsync(It.IsAny<Ulid>(), It.IsAny<CancellationToken>()), Times.Once);
+        mockRoleRepository.Verify(x => x.GetByUserIdAsync(It.IsAny<Ulid>(), It.IsAny<CancellationToken>()), Times.Never);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    [Trait("Users", "Queries/GetUserByIdQueryHandler/Handle")]
     public async Task Handle_ShouldThrowException_WhenUserHasNoRoles()
     {
         // Arrange

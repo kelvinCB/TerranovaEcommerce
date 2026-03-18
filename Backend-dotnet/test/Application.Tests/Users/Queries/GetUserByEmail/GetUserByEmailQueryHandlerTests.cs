@@ -124,6 +124,34 @@ public sealed class GetUserByEmailQueryHandlerTests
 
     [Fact]
     [Trait("Users", "Queries/GetUserByEmailQueryHandler/Handle")]
+    public async Task Handle_ShouldReturnNull_WhenUserIsDeleted()
+    {
+        // Arrange
+        var user = UserTestFactory.CreateUser();
+
+        user.SetIsDeleted(true, new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero)); // Deleted 1 Day from creation date
+
+        var mockUserRepository = new Mock<IUserRepository>();
+        var mockRoleRepository = new Mock<IRoleRepository>();
+
+        mockUserRepository
+            .Setup(x => x.GetByEmailAsync(It.IsAny<Email>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+
+        var handler = new GetUserByEmailQueryHandler(mockUserRepository.Object, mockRoleRepository.Object);
+
+        // Act
+        var result = await handler.Handle(new GetUserByEmailQuery(user.EmailAddress.Value), CancellationToken.None);
+
+        // Assert
+        mockUserRepository.Verify(x => x.GetByEmailAsync(user.EmailAddress, CancellationToken.None), Times.Once);
+        mockRoleRepository.Verify(x => x.GetByUserIdAsync(It.IsAny<Ulid>(), It.IsAny<CancellationToken>()), Times.Never);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    [Trait("Users", "Queries/GetUserByEmailQueryHandler/Handle")]
     public async Task Handle_ShouldThrowException_WhenUserHasNoRoles()
     {
         // Arrange
