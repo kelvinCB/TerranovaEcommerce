@@ -9,5 +9,5 @@ public sealed class UserHasNoRoleException : ApplicationExceptionBase
     /// Initializes a new instance of the <see cref="UserHasNoRoleException"/> class.
     /// </summary>
     /// <param name="id">The ID of the user that has no roles.</param>
-    public UserHasNoRoleException(Ulid id) : base($"User with id {id} has not role.") { }
+    public UserHasNoRoleException(Ulid id) : base($"User with id {id} has no role.") { }
 }
