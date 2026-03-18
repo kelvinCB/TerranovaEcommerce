@@ -13,21 +13,21 @@ public sealed class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, 
 {
     // Dependency injection
     private readonly IUserRepository _userRepository;
-    private readonly IRoleRepository _roleRepository;
+    private readonly IUserRoleRepository _userRoleRepository;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetUserByIdQueryHandler"/> class.
     /// </summary>
     /// <param name="userRepository">The user repository.</param>
-    /// <param name="roleRepository">The role repository.</param>
+    /// <param name="userRoleRepository">The user role repository.</param>
     /// <exception cref="ArgumentNullException">Thrown when user repository or role repository is null.</exception>
     public GetUserByIdQueryHandler(
         IUserRepository userRepository,
-        IRoleRepository roleRepository
+        IUserRoleRepository userRoleRepository
     )
     {
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
-        _roleRepository = roleRepository ?? throw new ArgumentNullException(nameof(roleRepository));
+        _userRoleRepository = userRoleRepository ?? throw new ArgumentNullException(nameof(userRoleRepository));
     }
 
     /// <summary>
@@ -41,19 +41,19 @@ public sealed class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, 
     {
         var user = await _userRepository.GetByIdAsync(request.Id, cancellationToken);
 
-        if(user is null)
+        if (user is null)
         {
             return null;
         }
 
-        if(user.IsDeleted)
+        if (user.IsDeleted)
         {
             return null;
         }
 
-        var roles = await _roleRepository.GetByUserIdAsync(user.Id, cancellationToken);
+        var roles = await _userRoleRepository.GetByUserIdAsync(user.Id, cancellationToken);
 
-        if (roles is null || !roles.Any())
+        if (!roles.Any())
         {
             throw new UserHasNoRoleException(user.Id);
         }
