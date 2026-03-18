@@ -81,19 +81,16 @@ public sealed class UpdateUserCommandHandlerTests()
     );
 
     // Act
-    var result = await handler.Handle(command, CancellationToken.None);
+    await handler.Handle(command, CancellationToken.None);
 
     // Assert
     mockUserRepository.Verify(x => x.GetByIdAsync(It.IsAny<Ulid>(), It.IsAny<CancellationToken>()), Times.Once);
     mockUserRepository.Verify(x => x.UpdateAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Once);
 
-    Assert.NotNull(result);
-    Assert.Equal(user.Id, result.Id);
-    Assert.Equal(user.FirstName, result.FirstName);
-    Assert.Equal(user.LastName, result.LastName);
-    Assert.Equal(user.Gender, result.Gender);
-    Assert.Equal(user.BirthDate, result.BirthDate);
-    Assert.Equal(new DateTimeOffset(2026, 1, 2, 0, 0, 0, TimeSpan.Zero), result.UpdatedAt);
+    Assert.Equal(command.FirstName, user.FirstName);
+    Assert.Equal(command.LastName, user.LastName);
+    Assert.Equal(command.Gender, user.Gender);
+    Assert.Equal(command.BirthDate, user.BirthDate);
   }
 
   [Fact]
@@ -129,19 +126,16 @@ public sealed class UpdateUserCommandHandlerTests()
     );
 
     // Act
-    var result = await handler.Handle(command, CancellationToken.None);
+    await handler.Handle(command, CancellationToken.None);
 
     // Assert
     mockUserRepository.Verify(x => x.GetByIdAsync(It.IsAny<Ulid>(), It.IsAny<CancellationToken>()), Times.Once);
     mockUserRepository.Verify(x => x.UpdateAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Once);
 
-    Assert.NotNull(result);
-    Assert.Equal(user.Id, result.Id);
-    Assert.Equal(originalFirstName, result.FirstName);
-    Assert.Equal(originalLastName, result.LastName);
-    Assert.Equal(originalGender, result.Gender);
-    Assert.Equal(originalBirthDate, result.BirthDate);
-    Assert.Equal(new DateTimeOffset(2026, 1, 2, 0, 0, 0, TimeSpan.Zero), result.UpdatedAt);
+    Assert.Equal(originalFirstName, user.FirstName);
+    Assert.Equal(originalLastName, user.LastName);
+    Assert.Equal(originalGender, user.Gender);
+    Assert.Equal(originalBirthDate, user.BirthDate);
   }
 
   [Fact]
