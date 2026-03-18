@@ -91,6 +91,12 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
 
         foreach(var roleId in request.RoleIds)
         {
+            if (roleId == default)
+            {
+                throw new NullReferenceException(nameof(roleId));
+            }
+
+
             var roleExists = await _roleRepository.ExistsByIdAsync(roleId, cancellationToken);
             if (!roleExists)
             {
