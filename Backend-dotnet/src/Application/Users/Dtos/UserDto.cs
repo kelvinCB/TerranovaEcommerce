@@ -19,13 +19,15 @@ public sealed class UserDto
     public required DateTimeOffset UpdatedAt { get; init; }
     public required string EmailAddress { get; init; }
     public required bool IsDeleted { get; init; }
+    public IReadOnlyCollection<RoleDto> Roles { get; init; } = [];
 
     /// <summary>
     /// Converts a user entity to a UserDto.
     /// </summary>
     /// <param name="user">The user entity to convert.</param>
-    /// <returns>Returns a UserDto representation of the user entity.</returns>
-    public static UserDto FromDomain(User user) => new UserDto
+    /// <param name="roles">The roles associated with the user.</param>
+    /// <returns>Returns a UserDto representation of the user entity and its associated roles.</returns>
+    public static UserDto FromDomain(User user, IReadOnlyCollection<Role> roles) => new UserDto
     {
         Id = user.Id,
         FirstName = user.FirstName,
@@ -37,6 +39,7 @@ public sealed class UserDto
         CreatedAt = user.CreatedAt,
         UpdatedAt = user.UpdatedAt,
         EmailAddress = user.EmailAddress.Value,
-        IsDeleted = user.IsDeleted
+        IsDeleted = user.IsDeleted,
+        Roles = roles.Select(x => RoleDto.FromDomain(x)).ToList()
     };
 }
