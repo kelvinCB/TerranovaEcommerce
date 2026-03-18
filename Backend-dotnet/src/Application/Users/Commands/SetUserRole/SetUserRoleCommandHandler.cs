@@ -25,7 +25,7 @@ public sealed class SetUserRoleCommandHandler : IRequestHandler<SetUserRoleComma
   /// <param name="roleRepository">The role repository.</param>
   /// <param name="userRoleRepository">The user role repository.</param>
   /// <param name="dateTimeProvider">The date-time provider service.</param>
-  /// <exception cref="ArgumentException">Thrown when any of the dependencies is null.</exception>
+  /// <exception cref="ArgumentNullException">Thrown when any of the dependencies is null.</exception>
   public SetUserRoleCommandHandler(
     IUserRepository userRepository,
     IRoleRepository roleRepository,
