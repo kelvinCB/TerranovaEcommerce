@@ -1,4 +1,3 @@
-using Application.Users.Dtos;
 using MediatR;
 
 namespace Application.Users.Commands.UpdateUser;
@@ -11,11 +10,11 @@ namespace Application.Users.Commands.UpdateUser;
 /// <param name="LastName">The last name of the user.</param>
 /// <param name="Gender">The gender of the user.</param>
 /// <param name="BirthDate">The birth date of the user.</param>
-/// <remarks>Mediator pattern is used to handle the command and return the updated user profile.</remarks>
+/// <remarks>Mediator pattern is used to handle the command.</remarks>
 public sealed record UpdateUserCommand(
   Ulid Id,
   string? FirstName,
   string? LastName,
   char? Gender,
   DateOnly? BirthDate
-) : IRequest<UserDto>;
+) : IRequest<Unit>;
