@@ -3,6 +3,8 @@ using Application.Common.Abstractions.Persistence;
 using Domain.Entities;
 using Domain.ValueObjects;
 using Moq;
+using Application.Common.Exceptions;
+using Common.Tests.Factories;
 
 namespace Application.Tests.Users.Queries.GetUserById;
 
@@ -14,9 +16,14 @@ public sealed class GetUserByIdQueryHandlerTests
     public void Constructor_ShouldInitialize_WithValidRepository()
     {
         // Act and Assert
-        var excepcion = Record.Exception(() => new GetUserByIdQueryHandler(Mock.Of<IUserRepository>()));
+        var exception = Record.Exception(() => 
+            new GetUserByIdQueryHandler(
+                Mock.Of<IUserRepository>(),
+                Mock.Of<IRoleRepository>()
+            )
+        );
 
-        Assert.Null(excepcion);
+        Assert.Null(exception);
     }
 
     [Fact]
@@ -24,7 +31,25 @@ public sealed class GetUserByIdQueryHandlerTests
     public void Constructor_ShouldThrowException_WhenUserRepositoryIsNull()
     {
         // Act and Assert
-        Assert.Throws<ArgumentNullException>(() => new GetUserByIdQueryHandler(default!)); // Force non-nullable for testing
+        Assert.Throws<ArgumentNullException>(() => 
+            new GetUserByIdQueryHandler(
+                default!, // Force non-nullable for testing
+                Mock.Of<IRoleRepository>()
+            )
+        );
+    }
+
+    [Fact]
+    [Trait("Users", "Queries/GetUserByIdQueryHandler/Constructor")]
+    public void Constructor_ShouldThrowException_WhenRoleRepositoryIsNull()
+    {
+        // Act and Assert
+        Assert.Throws<ArgumentNullException>(() => 
+            new GetUserByIdQueryHandler(
+                Mock.Of<IUserRepository>(),
+                default! // Force non-nullable for testing
+            )
+        );
     }
 
     [Fact]
@@ -32,31 +57,34 @@ public sealed class GetUserByIdQueryHandlerTests
     public async Task Handle_ShouldReturnUser_WhenUserExists()
     {
         // Arrange
-        var user = User.Create(
-            Ulid.NewUlid(),
-            "Briangel",
-            "Santana Calcanio",
-            new DateOnly(2001, 1, 1),
-            'M',
-            PasswordHash.From(new String('a', 64)),
-            new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero),
-            Email.Create("test@example.com"),
-            PhoneNumber.Create("+18298881212")
-        );
+
+        var user = UserTestFactory.CreateUser();
+
+        var role = new List<Role>();
+
+        role.Add(RoleTestFactory.CreateRole());
+
+        role.ForEach(x => user.AssignRole(x.Id, new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero)));
 
         var mockUserRepository = new Mock<IUserRepository>();
+        var mockRoleRepository = new Mock<IRoleRepository>();
 
         mockUserRepository
             .Setup(x => x.GetByIdAsync(It.IsAny<Ulid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(user);
 
-        var handler = new GetUserByIdQueryHandler(mockUserRepository.Object);
+        mockRoleRepository
+            .Setup(x => x.GetByUserIdAsync(It.IsAny<Ulid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(role);
+
+        var handler = new GetUserByIdQueryHandler(mockUserRepository.Object, mockRoleRepository.Object);
 
         // Act
         var result = await handler.Handle(new GetUserByIdQuery(user.Id), CancellationToken.None);
 
         // Assert
         mockUserRepository.Verify(x => x.GetByIdAsync(user.Id, CancellationToken.None), Times.Once);
+        mockRoleRepository.Verify(x => x.GetByUserIdAsync(It.IsAny<Ulid>(), It.IsAny<CancellationToken>()), Times.AtLeastOnce);
 
         Assert.NotNull(result);
         Assert.Equal(user.Id, result.Id);
@@ -77,32 +105,50 @@ public sealed class GetUserByIdQueryHandlerTests
     public async Task Handle_ShouldReturnNull_WhenUserDoesNotExist()
     {
         // Arrange
-        var user = User.Create(
-            Ulid.NewUlid(),
-            "Briangel",
-            "Santana Calcanio",
-            new DateOnly(2001, 1, 1),
-            'M',
-            PasswordHash.From(new String('a', 64)),
-            new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero),
-            Email.Create("test@example.com"),
-            PhoneNumber.Create("+18298881212")
-        );
-
         var mockUserRepository = new Mock<IUserRepository>();
+        var mockRoleRepository = new Mock<IRoleRepository>();
 
         mockUserRepository
             .Setup(x => x.GetByIdAsync(It.IsAny<Ulid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((User?)null);
 
-        var handler = new GetUserByIdQueryHandler(mockUserRepository.Object);
+        var handler = new GetUserByIdQueryHandler(mockUserRepository.Object, mockRoleRepository.Object);
 
         // Act
-        var result = await handler.Handle(new GetUserByIdQuery(user.Id), CancellationToken.None);
+        var result = await handler.Handle(new GetUserByIdQuery(Ulid.NewUlid()), CancellationToken.None);
 
         // Assert
         mockUserRepository.Verify(x => x.GetByIdAsync(It.IsAny<Ulid>(), It.IsAny<CancellationToken>()), Times.Once);
+        mockRoleRepository.Verify(x => x.GetByUserIdAsync(It.IsAny<Ulid>(), It.IsAny<CancellationToken>()), Times.Never);
+
         Assert.Null(result);
+    }
+
+    [Fact]
+    [Trait("Users", "Queries/GetUserByIdQueryHandler/Handle")]
+    public async Task Handle_ShouldThrowException_WhenUserHasNoRoles()
+    {
+        // Arrange
+        var user = UserTestFactory.CreateUser();
+
+        var mockUserRepository = new Mock<IUserRepository>();
+        var mockRoleRepository = new Mock<IRoleRepository>();
+
+        mockUserRepository
+            .Setup(x => x.GetByIdAsync(It.IsAny<Ulid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+
+        mockRoleRepository
+            .Setup(x => x.GetByUserIdAsync(It.IsAny<Ulid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((List<Role>?)null);
+
+        var handler = new GetUserByIdQueryHandler(mockUserRepository.Object, mockRoleRepository.Object);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<UserHasNoRoleException>(async () => await handler.Handle(new GetUserByIdQuery(user.Id), CancellationToken.None));
+
+        mockUserRepository.Verify(x => x.GetByIdAsync(It.IsAny<Ulid>(), It.IsAny<CancellationToken>()), Times.Once);
+        mockRoleRepository.Verify(x => x.GetByUserIdAsync(It.IsAny<Ulid>(), It.IsAny<CancellationToken>()), Times.AtLeastOnce);
     }
 
 }
