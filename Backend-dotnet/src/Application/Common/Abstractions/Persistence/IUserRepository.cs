@@ -1,3 +1,4 @@
+using Application.Common.Pagination;
 using Domain.Entities;
 using Domain.ValueObjects;
 
@@ -25,6 +26,16 @@ public interface IUserRepository
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <returns>Returns the user if found; otherwise, null.</returns>
     Task<User?> GetByEmailAsync(Email email, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Retrieves a paged list of users.
+    /// </summary>
+    /// <param name="page">The page number to retrieve</param>
+    /// <param name="pageSize">The number of items per page</param>
+    /// <param name="search">The search query</param>
+    /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+    /// <returns>Returns a PagedResult of User.</returns>
+    Task<PagedResult<User>> GetPagedAsync(int page, int pageSize, string? search, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Checks if a user with the specified email address exists.
