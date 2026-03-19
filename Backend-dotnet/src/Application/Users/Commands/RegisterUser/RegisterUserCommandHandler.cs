@@ -1,4 +1,3 @@
-using Application.Users.Dtos;
 using Application.Common.Abstractions.Persistence;
 using Application.Common.Abstractions.Services;
 using Application.Common.Exceptions;
@@ -55,6 +54,8 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
     /// <exception cref="RoleNotFoundException">Thrown when the specified role ID is not found.</exception>
     public async Task<Ulid> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
+        UserMustHaveAtLeastOneRoleException.ThrowIfNullOrEmpty(request.RoleIds);
+
         var email = Email.Create(request.Email);
 
         var userExists = await _userRepository.ExistsByEmailAsync(email, cancellationToken);
@@ -91,12 +92,6 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
 
         foreach(var roleId in request.RoleIds)
         {
-            if (roleId == default)
-            {
-                throw new NullReferenceException(nameof(roleId));
-            }
-
-
             var roleExists = await _roleRepository.ExistsByIdAsync(roleId, cancellationToken);
             if (!roleExists)
             {
