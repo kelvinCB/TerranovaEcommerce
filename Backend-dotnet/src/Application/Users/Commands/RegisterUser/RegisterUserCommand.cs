@@ -1,4 +1,3 @@
-using Application.Users.Dtos;
 using MediatR;
 
 namespace Application.Users.Commands.RegisterUser;
