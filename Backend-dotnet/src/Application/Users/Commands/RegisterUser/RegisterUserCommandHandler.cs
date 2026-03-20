@@ -50,11 +50,12 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
     /// <param name="request">The command request.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>Returns the user ID.</returns>
+    /// <exception cref="AtLeastOneRoleMustBeProvidedException">Thrown when no roles are provided.</exception>
     /// <exception cref="EmailAlreadyInUseException">Thrown when the specified email is already in use.</exception>
-    /// <exception cref="RoleNotFoundException">Thrown when the specified role ID is not found.</exception>
+    /// <exception cref="RolesNotFoundException">Thrown when the specified roles are not found.</exception>
     public async Task<Ulid> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
-        UserMustHaveAtLeastOneRoleException.ThrowIfNullOrEmpty(request.RoleIds);
+        AtLeastOneRoleMustBeProvidedException.ThrowIfNullOrEmpty(request.RoleIds);
 
         var email = Email.Create(request.Email);
 
@@ -90,14 +91,17 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
             phoneNumber: phoneNumber
         );
 
-        foreach(var roleId in request.RoleIds)
-        {
-            var roleExists = await _roleRepository.ExistsByIdAsync(roleId, cancellationToken);
-            if (!roleExists)
-            {
-                throw new RoleNotFoundException(roleId);
-            }
+        var existingRoles = await _roleRepository.GetExistingRoleIdsAsync(request.RoleIds, cancellationToken);
 
+        var missingRoles = request.RoleIds.Except(existingRoles).ToArray();
+
+        if (missingRoles.Length > 0)
+        {
+            throw new RolesNotFoundException(missingRoles);
+        }
+        
+        foreach (var roleId in existingRoles)
+        {
             user.AssignRole(roleId, timestamp);
         }
 

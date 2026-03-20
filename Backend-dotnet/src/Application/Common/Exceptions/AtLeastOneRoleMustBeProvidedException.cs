@@ -1,14 +1,14 @@
 namespace Application.Common.Exceptions;
 
 /// <summary>
-/// Thrown when a user must have at least one role.
+/// Thrown when at least one role must be provided.
 /// </summary>
-public sealed class UserMustHaveAtLeastOneRoleException : ApplicationExceptionBase
+public sealed class AtLeastOneRoleMustBeProvidedException : ApplicationExceptionBase
 {
   /// <summary>
-  /// Initializes a new instance of the <see cref="UserMustHaveAtLeastOneRoleException"/> class.
+  /// Initializes a new instance of the <see cref="AtLeastOneRoleMustBeProvidedException"/> class.
   /// </summary>
-  public UserMustHaveAtLeastOneRoleException() : base($"User must have at least one role.") { }
+  public AtLeastOneRoleMustBeProvidedException() : base("At least one role must be provided.") { }
 
   /// <summary>
   /// Throws an exception if the role IDs are null or empty.
@@ -18,7 +18,7 @@ public sealed class UserMustHaveAtLeastOneRoleException : ApplicationExceptionBa
   {
     if (roleIds == null || roleIds.Count == 0)
     {
-      throw new UserMustHaveAtLeastOneRoleException();
+      throw new AtLeastOneRoleMustBeProvidedException();
     }
   }
 }

@@ -16,18 +16,35 @@ public interface IUserRoleRepository
   Task<IReadOnlyCollection<Role>> GetByUserIdAsync(Ulid userId, CancellationToken cancellationToken);
 
   /// <summary>
-  /// Checks if a user-role relationship exists.
+  /// Retrieves the IDs of roles assigned to a user.
   /// </summary>
-  /// <param name="userId">The ID of the user.</param>
-  /// <param name="roleId">The ID of the role.</param>
+  /// <param name="userId">The ID of the user to retrieve role IDs for.</param>
+  /// <param name="roleIds">The IDs of the roles to retrieve.</param>
   /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
-  /// <returns>Returns a boolean value indicating whether the user-role relationship exists.</returns>
-  Task<bool> ExistsUserRoleAsync(Ulid userId, Ulid roleId, CancellationToken cancellationToken);
+  /// <returns>Returns a collection of role IDs associated with the user.</returns>
+  Task<IReadOnlyCollection<Ulid>> GetAssignedRoleIdsAsync(Ulid userId, IReadOnlyCollection<Ulid> roleIds, CancellationToken cancellationToken);
 
   /// <summary>
-  /// Registers a user-role relationship.
+  /// Retrieves the IDs of roles assigned to a user.
   /// </summary>
-  /// <param name="userRole">The user-role relationship to register.</param>
+  /// <param name="userId">The ID of the user to retrieve role IDs for.</param>
   /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
-  Task RegisterAsync(UserRole userRole, CancellationToken cancellationToken);
+  /// <returns>Returns a collection of role IDs associated with the user.</returns>
+  Task<IReadOnlyCollection<Ulid>> GetRoleIdsByUserIdAsync(Ulid userId, CancellationToken cancellationToken);
+
+  /// <summary>
+  /// Assigns roles to a user.
+  /// </summary>
+  /// <param name="userId">The ID of the user to assign roles to.</param>
+  /// <param name="roleIds">The IDs of the roles to assign to the user.</param>
+  /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+  Task AssignRolesToUserAsync(Ulid userId, IReadOnlyCollection<Ulid> roleIds, CancellationToken cancellationToken);
+
+  /// <summary>
+  /// Removes roles from a user.
+  /// </summary>
+  /// <param name="userId">The ID of the user to remove roles from.</param>
+  /// <param name="roleIds">The IDs of the roles to remove from the user.</param>
+  /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+  Task RemoveRolesFromUserAsync(Ulid userId, IReadOnlyCollection<Ulid> roleIds, CancellationToken cancellationToken);
 }

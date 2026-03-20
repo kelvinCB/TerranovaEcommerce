@@ -157,8 +157,8 @@ public sealed class RegisterUserCommandHandlerTests
             .Returns(Ulid.NewUlid());
 
         mockRoleRepository
-            .Setup(x => x.ExistsByIdAsync(It.Is<Ulid>(id => roleIds.Contains(id)), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(true);
+            .Setup(x => x.GetExistingRoleIdsAsync(It.IsAny<IReadOnlyCollection<Ulid>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(roleIds.AsReadOnly());
 
         mockUserRepository.Setup(x => x.RegisterAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()));
 
@@ -178,7 +178,7 @@ public sealed class RegisterUserCommandHandlerTests
         mockPasswordHasher.Verify(x => x.HashPassword(userCommand.Password), Times.Once);
         mockDateTimeProvider.Verify(x => x.Timestamp, Times.Once);
         mockIdGenerator.Verify(x => x.NewUlid(), Times.Once);
-        mockRoleRepository.Verify(x => x.ExistsByIdAsync(It.Is<Ulid>(id => roleIds.Contains(id)), CancellationToken.None), Times.Exactly(roleIds.Count));
+        mockRoleRepository.Verify(x => x.GetExistingRoleIdsAsync(It.Is<IReadOnlyCollection<Ulid>>(id => id.Count == roleIds.Count), CancellationToken.None), Times.Exactly(roleIds.Count));
         mockUserRepository.Verify(
             x => x.RegisterAsync(
                 It.Is<User>(u =>
@@ -231,7 +231,7 @@ public sealed class RegisterUserCommandHandlerTests
         mockPasswordHasher.Setup(x => x.HashPassword(userCommand.Password)).Returns(new String('a', 64));
         mockDateTimeProvider.Setup(x => x.Timestamp).Returns(timestamp);
         mockIdGenerator.Setup(x => x.NewUlid()).Returns(Ulid.NewUlid());
-        mockRoleRepository.Setup(x => x.ExistsByIdAsync(It.Is<Ulid>(id => roleIds.Contains(id)), token)).ReturnsAsync(true);
+        mockRoleRepository.Setup(x => x.GetExistingRoleIdsAsync(It.IsAny<IReadOnlyCollection<Ulid>>(), token)).ReturnsAsync(roleIds.AsReadOnly());
         mockUserRepository.Setup(x => x.RegisterAsync(It.IsAny<User>(), token));
 
         var handler = new RegisterUserCommandHandler(
@@ -250,8 +250,92 @@ public sealed class RegisterUserCommandHandlerTests
         mockPasswordHasher.Verify(x => x.HashPassword(userCommand.Password), Times.Once);
         mockDateTimeProvider.Verify(x => x.Timestamp, Times.Once);
         mockIdGenerator.Verify(x => x.NewUlid(), Times.Once);
-        mockRoleRepository.Verify(x => x.ExistsByIdAsync(It.Is<Ulid>(id => roleIds.Contains(id)), token), Times.Exactly(roleIds.Count));
+        mockRoleRepository.Verify(x => x.GetExistingRoleIdsAsync(It.IsAny<IReadOnlyCollection<Ulid>>(), token), Times.Exactly(roleIds.Count));
         mockUserRepository.Verify(x => x.RegisterAsync(It.IsAny<User>(), token), Times.Once);
+    }
+
+    [Fact]
+    [Trait("Users", "Commands/RegisterUser/RegisterUserCommandHandler/Handle")]
+    public async Task Handle_ShouldThrowException_WhenRoleNotProvided()
+    {
+        // Arrange
+        var roleIds = new List<Ulid>();
+
+        var userCommand = new RegisterUserCommand(
+            "Briangel",
+            "Santana Calcanio",
+            "+18298881212",
+            new DateOnly(2001, 1, 1),
+            'M',
+            "TestPassword123",
+            "test@example.com",
+            roleIds.AsReadOnly()
+        );
+        
+        var mockUserRepository = new Mock<IUserRepository>();
+        var mockRoleRepository = new Mock<IRoleRepository>();
+        var mockPasswordHasher = new Mock<IPasswordHasher>();
+        var mockDateTimeProvider = new Mock<IDateTimeProvider>();
+        var mockIdGenerator = new Mock<IIdGenerator>();
+
+        var handler = new RegisterUserCommandHandler(
+            mockUserRepository.Object,
+            mockRoleRepository.Object,
+            mockPasswordHasher.Object,
+            mockDateTimeProvider.Object,
+            mockIdGenerator.Object
+        );
+
+        // Act and Assert
+        await Assert.ThrowsAsync<AtLeastOneRoleMustBeProvidedException>(() => handler.Handle(userCommand, CancellationToken.None));
+
+        mockUserRepository.Verify(x => x.ExistsByEmailAsync(It.IsAny<Email>(), It.IsAny<CancellationToken>()), Times.Never);
+        mockPasswordHasher.Verify(x => x.HashPassword(It.IsAny<string>()), Times.Never);
+        mockDateTimeProvider.Verify(x => x.Timestamp, Times.Never);
+        mockIdGenerator.Verify(x => x.NewUlid(), Times.Never);
+        mockRoleRepository.Verify(x => x.GetExistingRoleIdsAsync(It.IsAny<IReadOnlyCollection<Ulid>>(), It.IsAny<CancellationToken>()), Times.Never);
+        mockUserRepository.Verify(x => x.RegisterAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    [Trait("Users", "Commands/RegisterUser/RegisterUserCommandHandler/Handle")]
+    public async Task Handle_ShouldThrowException_WhenUserHasNoRole()
+    {
+        // Arrange
+        var mockUserRepository = new Mock<IUserRepository>();
+        var mockRoleRepository = new Mock<IRoleRepository>();
+        var mockPasswordHasher = new Mock<IPasswordHasher>();
+        var mockDateTimeProvider = new Mock<IDateTimeProvider>();
+        var mockIdGenerator = new Mock<IIdGenerator>();
+
+        var handler = new RegisterUserCommandHandler(
+            mockUserRepository.Object,
+            mockRoleRepository.Object,
+            mockPasswordHasher.Object,
+            mockDateTimeProvider.Object,
+            mockIdGenerator.Object
+        );
+
+        var userCommand = new RegisterUserCommand(
+            "Briangel",
+            "Santana Calcanio",
+            "+18298881212",
+            new DateOnly(2001, 1, 1),
+            'M',
+            "TestPassword123",
+            "test@example.com",
+            new List<Ulid>().AsReadOnly()
+        );
+
+        // Act and Assert
+        await Assert.ThrowsAsync<AtLeastOneRoleMustBeProvidedException>(() => handler.Handle(userCommand, CancellationToken.None));
+
+        mockUserRepository.Verify(x => x.ExistsByEmailAsync(Email.Create(userCommand.Email), It.IsAny<CancellationToken>()), Times.Never);
+        mockPasswordHasher.Verify(x => x.HashPassword(userCommand.Password), Times.Never);
+        mockDateTimeProvider.Verify(x => x.Timestamp, Times.Never);
+        mockIdGenerator.Verify(x => x.NewUlid(), Times.Never);
+        mockRoleRepository.Verify(x => x.GetExistingRoleIdsAsync(It.IsAny<IReadOnlyCollection<Ulid>>(), It.IsAny<CancellationToken>()), Times.Never);
+        mockUserRepository.Verify(x => x.RegisterAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -298,7 +382,7 @@ public sealed class RegisterUserCommandHandlerTests
         mockPasswordHasher.Verify(x => x.HashPassword(userCommand.Password), Times.Never);
         mockDateTimeProvider.Verify(x => x.Timestamp, Times.Never);
         mockIdGenerator.Verify(x => x.NewUlid(), Times.Never);
-        mockRoleRepository.Verify(x => x.ExistsByIdAsync(It.Is<Ulid>(id => roleIds.Contains(id)), It.IsAny<CancellationToken>()), Times.Never);
+        mockRoleRepository.Verify(x => x.GetExistingRoleIdsAsync(It.IsAny<IReadOnlyCollection<Ulid>>(), It.IsAny<CancellationToken>()), Times.Never);
         mockUserRepository.Verify(x => x.RegisterAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -331,7 +415,7 @@ public sealed class RegisterUserCommandHandlerTests
 
         mockUserRepository.Setup(x => x.RegisterAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()));
         
-        mockRoleRepository.Setup(x => x.ExistsByIdAsync(It.Is<Ulid>(id => roleIds.Contains(id)), It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        mockRoleRepository.Setup(x => x.GetExistingRoleIdsAsync(It.IsAny<IReadOnlyCollection<Ulid>>(), It.IsAny<CancellationToken>())).ReturnsAsync(roleIds);
 
         mockPasswordHasher
             .Setup(x => x.HashPassword(It.IsAny<string>()))
@@ -361,7 +445,7 @@ public sealed class RegisterUserCommandHandlerTests
         mockPasswordHasher.Verify(x => x.HashPassword(userCommand.Password), Times.Once);
         mockDateTimeProvider.Verify(x => x.Timestamp, Times.Once);
         mockIdGenerator.Verify(x => x.NewUlid(), Times.Once);
-        mockRoleRepository.Verify(x => x.ExistsByIdAsync(It.Is<Ulid>(id => roleIds.Contains(id)), It.IsAny<CancellationToken>()), Times.Exactly(roleIds.Count));
+        mockRoleRepository.Verify(x => x.GetExistingRoleIdsAsync(It.IsAny<IReadOnlyCollection<Ulid>>(), It.IsAny<CancellationToken>()), Times.Exactly(roleIds.Count));
         mockUserRepository.Verify(
             x => x.RegisterAsync(
                 It.Is<User>(u =>
@@ -381,47 +465,6 @@ public sealed class RegisterUserCommandHandlerTests
             , Times.Once);
 
         Assert.NotEqual(default, userId);
-    }
-
-    [Fact]
-    [Trait("Users", "Commands/RegisterUser/RegisterUserCommandHandler/Handle")]
-    public async Task Handle_ShouldThrowException_WhenUserHasNoRole()
-    {
-        // Arrange
-        var mockUserRepository = new Mock<IUserRepository>();
-        var mockRoleRepository = new Mock<IRoleRepository>();
-        var mockPasswordHasher = new Mock<IPasswordHasher>();
-        var mockDateTimeProvider = new Mock<IDateTimeProvider>();
-        var mockIdGenerator = new Mock<IIdGenerator>();
-
-        var handler = new RegisterUserCommandHandler(
-            mockUserRepository.Object,
-            mockRoleRepository.Object,
-            mockPasswordHasher.Object,
-            mockDateTimeProvider.Object,
-            mockIdGenerator.Object
-        );
-
-        var userCommand = new RegisterUserCommand(
-            "Briangel",
-            "Santana Calcanio",
-            "+18298881212",
-            new DateOnly(2001, 1, 1),
-            'M',
-            "TestPassword123",
-            "test@example.com",
-            new List<Ulid>().AsReadOnly()
-        );
-
-        // Act and Assert
-        await Assert.ThrowsAsync<UserMustHaveAtLeastOneRoleException>(() => handler.Handle(userCommand, CancellationToken.None));
-
-        mockUserRepository.Verify(x => x.ExistsByEmailAsync(Email.Create(userCommand.Email), It.IsAny<CancellationToken>()), Times.Never);
-        mockPasswordHasher.Verify(x => x.HashPassword(userCommand.Password), Times.Never);
-        mockDateTimeProvider.Verify(x => x.Timestamp, Times.Never);
-        mockIdGenerator.Verify(x => x.NewUlid(), Times.Never);
-        mockRoleRepository.Verify(x => x.ExistsByIdAsync(It.IsAny<Ulid>(), It.IsAny<CancellationToken>()), Times.Never);
-        mockUserRepository.Verify(x => x.RegisterAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
