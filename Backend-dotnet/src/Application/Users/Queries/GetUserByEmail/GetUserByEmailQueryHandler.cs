@@ -1,4 +1,5 @@
 using Application.Common.Abstractions.Persistence;
+using Application.Common.Exceptions;
 using Application.Users.Dtos;
 using Domain.ValueObjects;
 using MediatR;
@@ -13,15 +14,21 @@ public sealed class GetUserByEmailQueryHandler : IRequestHandler<GetUserByEmailQ
 {
     // Dependency injection
     private readonly IUserRepository _userRepository;
+    private readonly IUserRoleRepository _userRoleRepository;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetUserByEmailQueryHandler"/> class.
     /// </summary>
     /// <param name="userRepository">The user repository.</param>
-    /// <exception cref="ArgumentNullException">Thrown when the user repository is null.</exception>
-    public GetUserByEmailQueryHandler(IUserRepository userRepository)
+    /// <param name="userRoleRepository">The user role repository.</param>
+    /// <exception cref="ArgumentNullException">Thrown when user repository or role repository is null.</exception>
+    public GetUserByEmailQueryHandler(
+        IUserRepository userRepository,
+        IUserRoleRepository userRoleRepository
+    )
     {
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
+        _userRoleRepository = userRoleRepository ?? throw new ArgumentNullException(nameof(userRoleRepository));
     }
 
     /// <summary>
@@ -30,14 +37,29 @@ public sealed class GetUserByEmailQueryHandler : IRequestHandler<GetUserByEmailQ
     /// <param name="request">The query request.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>Returns a UserDto representation of the user entity.</returns>
+    /// <exception cref="UserHasNoRoleException">Thrown when the user has no roles.</exception>
     public async Task<UserDto?> Handle(GetUserByEmailQuery request, CancellationToken cancellationToken)
     {
         var email = Email.Create(request.Email);
         var user = await _userRepository.GetByEmailAsync(email, cancellationToken);
 
         if (user is null)
+        {
             return null;
+        }
 
-        return UserDto.FromDomain(user);
+        if (user.IsDeleted)
+        {
+            return null;
+        }
+        
+        var roles = await _userRoleRepository.GetByUserIdAsync(user.Id, cancellationToken);
+
+        if (!roles.Any())
+        {
+            throw new UserHasNoRoleException(user.Id);
+        }
+
+        return UserDto.FromDomain(user, roles);
     }
 }

@@ -1,4 +1,3 @@
-using Application.Users.Dtos;
 using MediatR;
 
 namespace Application.Users.Commands.RegisterUser;
@@ -13,7 +12,8 @@ namespace Application.Users.Commands.RegisterUser;
 /// <param name="Gender">The gender of the user</param>
 /// <param name="Password">The password of the user</param>
 /// <param name="Email">The email address of the user</param>
-/// <remarks>Mediator pattern is used to handle the command and return the registered user.</remarks>
+/// <param name="RoleIds">The IDs of the roles associated with the user</param>
+/// <remarks>Mediator pattern is used to handle the command and return the user ID.</remarks>
 public sealed record RegisterUserCommand(
     string FirstName,
     string LastName,
@@ -21,5 +21,6 @@ public sealed record RegisterUserCommand(
     DateOnly BirthDate,
     char Gender,
     string Password,
-    string Email
-) : IRequest<UserDto>;
+    string Email,
+    IReadOnlyCollection<Ulid> RoleIds
+) : IRequest<Ulid>;
