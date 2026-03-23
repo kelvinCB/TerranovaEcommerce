@@ -16,32 +16,40 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
     // Dependencies
     private readonly IUserRepository _userRepository;
     private readonly IRoleRepository _roleRepository;
+    private readonly IUserRoleRepository _userRoleRepository;
     private readonly IPasswordHasher _passwordHasher;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IIdGenerator _idGenerator;
+    private readonly IUnitOfWork _unitOfWork;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RegisterUserCommandHandler"/> class.
     /// </summary>
     /// <param name="userRepository">The user repository.</param>
     /// <param name="passwordHasher">The password hasher service.</param>
+    /// <param name="userRoleRepository">The user role repository.</param>
     /// <param name="dateTimeProvider">The date-time provider service.</param>
     /// <param name="idGenerator">The ID generator service.</param>
     /// <param name="roleRepository">The role repository.</param>
+    /// <param name="unitOfWork">The unit of work service.</param>
     /// <exception cref="ArgumentNullException">Thrown when the user repository, role repository, password hasher, date-time provider or ID generator is null.</exception>
     public RegisterUserCommandHandler(
         IUserRepository userRepository,
         IRoleRepository roleRepository,
+        IUserRoleRepository userRoleRepository,
         IPasswordHasher passwordHasher,
         IDateTimeProvider dateTimeProvider,
-        IIdGenerator idGenerator
+        IIdGenerator idGenerator,
+        IUnitOfWork unitOfWork
     )
     {
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         _roleRepository = roleRepository ?? throw new ArgumentNullException(nameof(roleRepository));
+        _userRoleRepository = userRoleRepository ?? throw new ArgumentNullException(nameof(userRoleRepository));
         _passwordHasher = passwordHasher ?? throw new ArgumentNullException(nameof(passwordHasher));
         _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         _idGenerator = idGenerator ?? throw new ArgumentNullException(nameof(idGenerator));
+        _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
 
     /// <summary>
@@ -50,36 +58,55 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
     /// <param name="request">The command request.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>Returns the user ID.</returns>
+    /// <exception cref="AtLeastOneRoleMustBeProvidedException">Thrown when no roles are provided.</exception>
     /// <exception cref="EmailAlreadyInUseException">Thrown when the specified email is already in use.</exception>
-    /// <exception cref="RoleNotFoundException">Thrown when the specified role ID is not found.</exception>
+    /// <exception cref="RolesNotFoundException">Thrown when the specified roles are not found.</exception>
     public async Task<Ulid> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
-        UserMustHaveAtLeastOneRoleException.ThrowIfNullOrEmpty(request.RoleIds);
+        EnsureRolesProvided(request.RoleIds);
 
         var email = Email.Create(request.Email);
 
+        await EnsureEmailIsAvailableAsync(email, cancellationToken);
+
+        var phoneNumber = CreatePhoneNumber(request.PhoneNumber);
+        var passwordHash = CreatePasswordHash(request.Password);
+        var timestamp = _dateTimeProvider.Timestamp;
+        var userId = _idGenerator.NewUlid();
+
+        var user = CreateUser(request, userId, passwordHash, email, phoneNumber, timestamp);
+
+        var existingRoles = await GetValidatedRolesAsync(request.RoleIds, cancellationToken);
+        var userRole = CreateUserRoles(userId, existingRoles, timestamp);
+
+        await _userRepository.RegisterAsync(user, cancellationToken);
+        await _userRoleRepository.AssignRolesToUserAsync(userRole, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return user.Id;
+    }
+
+    // Private methods
+    
+    private void EnsureRolesProvided(IReadOnlyCollection<Ulid> roleIds) => AtLeastOneRoleMustBeProvidedException.ThrowIfNullOrEmpty(roleIds);
+
+    private async Task EnsureEmailIsAvailableAsync(Email email, CancellationToken cancellationToken)
+    {
         var userExists = await _userRepository.ExistsByEmailAsync(email, cancellationToken);
         if (userExists)
         {
             throw new EmailAlreadyInUseException(email.Value);
         }
+    }
 
-        var phoneNumber = default(PhoneNumber);
-        if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
-        {
-            phoneNumber = PhoneNumber.Create(request.PhoneNumber);
-        }
-        
-        var passwordHash = PasswordHash.From(
-            _passwordHasher.HashPassword(request.Password)
-        );
+    private PhoneNumber? CreatePhoneNumber(string? phoneNumber) => string.IsNullOrWhiteSpace(phoneNumber) ? default : PhoneNumber.Create(phoneNumber);
 
-        var timestamp = _dateTimeProvider.Timestamp;
+    private PasswordHash CreatePasswordHash(string password) => PasswordHash.From(_passwordHasher.HashPassword(password));
 
-        var id = _idGenerator.NewUlid();
-
-        var user = User.Create(
-            id: id,
+    private User CreateUser(RegisterUserCommand request, Ulid userId, PasswordHash passwordHash, Email email, PhoneNumber? phoneNumber, DateTimeOffset timestamp)
+    {
+        return User.Create(
+            id: userId,
             firstName: request.FirstName,
             lastName: request.LastName,
             birthDate: request.BirthDate,
@@ -89,20 +116,28 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
             emailAddress: email,
             phoneNumber: phoneNumber
         );
+    }
 
-        foreach(var roleId in request.RoleIds)
+    private async Task<IReadOnlyCollection<Ulid>> GetValidatedRolesAsync(IReadOnlyCollection<Ulid> roleIds, CancellationToken cancellationToken)
+    {
+        var requestedRoleIds = roleIds.Distinct().ToArray();
+
+        var existingRoles = await _roleRepository.GetExistingRoleIdsAsync(requestedRoleIds, cancellationToken);
+
+        var missingRoles = requestedRoleIds.Except(existingRoles).ToArray();
+
+        if (missingRoles.Length > 0)
         {
-            var roleExists = await _roleRepository.ExistsByIdAsync(roleId, cancellationToken);
-            if (!roleExists)
-            {
-                throw new RoleNotFoundException(roleId);
-            }
-
-            user.AssignRole(roleId, timestamp);
+            throw new RolesNotFoundException(missingRoles);
         }
 
-        await _userRepository.RegisterAsync(user, cancellationToken);
+        return existingRoles;
+    }
 
-        return user.Id;
+    private IReadOnlyCollection<UserRole> CreateUserRoles(Ulid userId, IReadOnlyCollection<Ulid> roleIds, DateTimeOffset timestamp)
+    {
+        var userRole = roleIds.Select(roleId => UserRole.Create(userId, roleId, timestamp)).ToArray();
+
+        return userRole;
     }
 }

@@ -14,20 +14,24 @@ public sealed class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand
   /// Dependencies
   private readonly IUserRepository _userRepository;
   private readonly IDateTimeProvider _dateTimeProvider;
+  private readonly IUnitOfWork _unitOfWork;
 
   /// <summary>
   /// Initializes a new instance of the <see cref="UpdateUserCommandHandler"/> class.
   /// </summary>
   /// <param name="userRepository">The user repository.</param>
   /// <param name="dateTimeProvider">The date-time provider service.</param>
+  /// <param name="unitOfWork">The unit of work service.</param>
   /// <exception cref="ArgumentNullException">Thrown when the user repository or date-time provider is null.</exception>
   public UpdateUserCommandHandler(
     IUserRepository userRepository,
-    IDateTimeProvider dateTimeProvider
+    IDateTimeProvider dateTimeProvider,
+    IUnitOfWork unitOfWork
   )
   {
     _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
     _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
+    _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
   }
 
   /// <summary>
@@ -46,6 +50,11 @@ public sealed class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand
       throw new UserNotFoundException(request.Id);
     }
 
+    if (user.IsDeleted)
+    {
+      throw new UserAlreadyDeletedException(request.Id);
+    }
+
     var timestamp = _dateTimeProvider.Timestamp;
 
     if (request.BirthDate.HasValue)
@@ -59,6 +68,7 @@ public sealed class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand
     );
 
     await _userRepository.UpdateAsync(user, cancellationToken);
+    await _unitOfWork.SaveChangesAsync(cancellationToken);
 
     return Unit.Value;
   }
