@@ -19,7 +19,8 @@ public sealed class SoftDeleteUserCommandHandlerTests
     var exception = Record.Exception(() => 
       new SoftDeleteUserCommandHandler(
         Mock.Of<IUserRepository>(),
-        Mock.Of<IDateTimeProvider>()
+        Mock.Of<IDateTimeProvider>(),
+        Mock.Of<IUnitOfWork>()
       )
     );
 
@@ -34,7 +35,8 @@ public sealed class SoftDeleteUserCommandHandlerTests
     Assert.Throws<ArgumentNullException>(() => 
       new SoftDeleteUserCommandHandler(
         default!, // Force non-nullable UserRepository for testing
-        Mock.Of<IDateTimeProvider>()
+        Mock.Of<IDateTimeProvider>(),
+        Mock.Of<IUnitOfWork>()
       )
     );
   }
@@ -47,7 +49,22 @@ public sealed class SoftDeleteUserCommandHandlerTests
     Assert.Throws<ArgumentNullException>(() => 
       new SoftDeleteUserCommandHandler(
         Mock.Of<IUserRepository>(),
-        default! // Force non-nullable DateTimeProvider for testing
+        default!, // Force non-nullable DateTimeProvider for testing
+        Mock.Of<IUnitOfWork>()
+      )
+    );
+  }
+
+  [Fact]
+  [Trait("Users", "Commands/SoftDeleteUser/SoftDeleteUserCommandHandler/Constructor")]
+  public void Constructor_ShouldThrowException_WhenUnitOfWorkIsNull()
+  {
+    // Act and Assert
+    Assert.Throws<ArgumentNullException>(() => 
+      new SoftDeleteUserCommandHandler(
+        Mock.Of<IUserRepository>(),
+        Mock.Of<IDateTimeProvider>(),
+        default! // Force non-nullable UnitOfWork for testing
       )
     );
   }
@@ -61,6 +78,7 @@ public sealed class SoftDeleteUserCommandHandlerTests
 
     var mockUserRepository = new Mock<IUserRepository>();
     var mockDateTimeProvider = new Mock<IDateTimeProvider>();
+    var mockUnitOfWork = new Mock<IUnitOfWork>();
 
     mockUserRepository
       .Setup(x => x.GetByIdAsync(user.Id, It.IsAny<CancellationToken>()))
@@ -73,7 +91,15 @@ public sealed class SoftDeleteUserCommandHandlerTests
         .Setup(x => x.Timestamp)
         .Returns(new DateTimeOffset(2026, 1, 2, 0, 0, 0, TimeSpan.Zero)); // 2 Days from creation date
 
-    var handler = new SoftDeleteUserCommandHandler(mockUserRepository.Object, mockDateTimeProvider.Object);
+    mockUnitOfWork
+      .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+      .Returns(Task.CompletedTask);
+
+    var handler = new SoftDeleteUserCommandHandler(
+      mockUserRepository.Object,
+      mockDateTimeProvider.Object,
+      mockUnitOfWork.Object
+    );
 
     var command = new SoftDeleteUserCommand(user.Id);
 
@@ -84,6 +110,7 @@ public sealed class SoftDeleteUserCommandHandlerTests
     mockUserRepository.Verify(x => x.GetByIdAsync(user.Id, It.IsAny<CancellationToken>()), Times.Once);
     mockDateTimeProvider.Verify(x => x.Timestamp, Times.Once);
     mockUserRepository.Verify(x => x.SoftDeleteAsync(user, It.IsAny<CancellationToken>()), Times.Once);
+    mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
 
     Assert.True(user.IsDeleted);
   }
@@ -95,6 +122,7 @@ public sealed class SoftDeleteUserCommandHandlerTests
     // Arrange
     var mockUserRepository = new Mock<IUserRepository>();
     var mockDateTimeProvider = new Mock<IDateTimeProvider>();
+    var mockUnitOfWork = new Mock<IUnitOfWork>();
 
     mockUserRepository
       .Setup(x => x.GetByIdAsync(It.IsAny<Ulid>(), It.IsAny<CancellationToken>()))
@@ -107,7 +135,15 @@ public sealed class SoftDeleteUserCommandHandlerTests
         .Setup(x => x.Timestamp)
         .Returns(new DateTimeOffset(2026, 1, 2, 0, 0, 0, TimeSpan.Zero)); // 2 Days from creation date
 
-    var handler = new SoftDeleteUserCommandHandler(mockUserRepository.Object, mockDateTimeProvider.Object);
+    mockUnitOfWork
+      .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+      .Returns(Task.CompletedTask);
+
+    var handler = new SoftDeleteUserCommandHandler(
+      mockUserRepository.Object,
+      mockDateTimeProvider.Object,
+      mockUnitOfWork.Object
+    );
 
     var command = new SoftDeleteUserCommand(Ulid.NewUlid());
 
@@ -117,6 +153,7 @@ public sealed class SoftDeleteUserCommandHandlerTests
     mockUserRepository.Verify(x => x.GetByIdAsync(It.IsAny<Ulid>(), It.IsAny<CancellationToken>()), Times.Once);
     mockDateTimeProvider.Verify(x => x.Timestamp, Times.Never);
     mockUserRepository.Verify(x => x.SoftDeleteAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Never);
+    mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
 
     Assert.NotNull(exception);
     Assert.IsType<UserNotFoundException>(exception);
@@ -133,6 +170,7 @@ public sealed class SoftDeleteUserCommandHandlerTests
 
     var mockUserRepository = new Mock<IUserRepository>();
     var mockDateTimeProvider = new Mock<IDateTimeProvider>();
+    var mockUnitOfWork = new Mock<IUnitOfWork>();
 
     mockUserRepository
       .Setup(x => x.GetByIdAsync(user.Id, It.IsAny<CancellationToken>()))
@@ -145,7 +183,15 @@ public sealed class SoftDeleteUserCommandHandlerTests
         .Setup(x => x.Timestamp)
         .Returns(new DateTimeOffset(2026, 1, 2, 0, 0, 0, TimeSpan.Zero)); // 2 Days from creation date
 
-    var handler = new SoftDeleteUserCommandHandler(mockUserRepository.Object, mockDateTimeProvider.Object);
+    mockUnitOfWork
+      .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+      .Returns(Task.CompletedTask);
+
+    var handler = new SoftDeleteUserCommandHandler(
+      mockUserRepository.Object,
+      mockDateTimeProvider.Object,
+      mockUnitOfWork.Object
+    );
 
     var command = new SoftDeleteUserCommand(user.Id);
 
@@ -155,6 +201,7 @@ public sealed class SoftDeleteUserCommandHandlerTests
     mockUserRepository.Verify(x => x.GetByIdAsync(user.Id, It.IsAny<CancellationToken>()), Times.Once);
     mockDateTimeProvider.Verify(x => x.Timestamp, Times.Never);
     mockUserRepository.Verify(x => x.SoftDeleteAsync(user, It.IsAny<CancellationToken>()), Times.Never);
+    mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
 
     Assert.NotNull(exception);
     Assert.IsType<UserAlreadyDeletedException>(exception);
