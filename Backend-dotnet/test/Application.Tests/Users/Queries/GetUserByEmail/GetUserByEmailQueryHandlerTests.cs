@@ -63,8 +63,6 @@ public sealed class GetUserByEmailQueryHandlerTests
 
         role.Add(RoleTestFactory.CreateRole());
 
-        role.ForEach(x => user.AssignRole(x.Id, new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero)));
-
         var mockUserRepository = new Mock<IUserRepository>();
         var mockUserRoleRepository = new Mock<IUserRoleRepository>();
 
@@ -97,6 +95,10 @@ public sealed class GetUserByEmailQueryHandlerTests
         Assert.Equal(user.EmailAddress.Value, result.EmailAddress);
         Assert.Equal(user.IsDeleted, result.IsDeleted);
         Assert.Equal(user.PhoneNumber?.Value, result.PhoneNumber);
+        Assert.NotEmpty(result.Roles);
+        Assert.True(role.All(x => result.Roles.Select(y => y.Id).Contains(x.Id)));
+        Assert.True(role.All(x => result.Roles.Select(x => x.Name).Contains(x.Name)));
+        Assert.True(role.All(x => result.Roles.Select(x => x.Description).Contains(x.Description)));
     }
 
     [Fact]
