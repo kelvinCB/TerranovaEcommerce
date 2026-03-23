@@ -1,5 +1,3 @@
-using Domain.Entities;
-
 namespace Application.Common.Abstractions.Persistence;
 
 /// <summary>
@@ -8,10 +6,10 @@ namespace Application.Common.Abstractions.Persistence;
 public interface IRoleRepository
 {
     /// <summary>
-    /// Checks if a role exists by its ID.
+    /// Gets existing role IDs.
     /// </summary>
-    /// <param name="id">The ID of the role to check.</param>
-    /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
-    /// <returns>Returns true if the role exists, otherwise false.</returns>
-    Task<bool> ExistsByIdAsync(Ulid id, CancellationToken cancellationToken);
+    /// <param name="roleIds">The IDs of the roles to check.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    /// <returns>Returns a collection of existing role IDs.</returns>
+    Task<IReadOnlyCollection<Ulid>> GetExistingRoleIdsAsync(IReadOnlyCollection<Ulid> roleIds, CancellationToken cancellationToken);
 }
