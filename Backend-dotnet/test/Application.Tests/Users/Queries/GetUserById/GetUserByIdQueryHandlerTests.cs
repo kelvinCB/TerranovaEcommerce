@@ -64,8 +64,6 @@ public sealed class GetUserByIdQueryHandlerTests
 
         role.Add(RoleTestFactory.CreateRole());
 
-        role.ForEach(x => user.AssignRole(x.Id, new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero)));
-
         var mockUserRepository = new Mock<IUserRepository>();
         var mockUserRoleRepository = new Mock<IUserRoleRepository>();
 
@@ -98,6 +96,10 @@ public sealed class GetUserByIdQueryHandlerTests
         Assert.Equal(user.EmailAddress.Value, result.EmailAddress);
         Assert.Equal(user.IsDeleted, result.IsDeleted);
         Assert.Equal(user.PhoneNumber?.Value, result.PhoneNumber);
+        Assert.NotNull(result.Roles);
+        Assert.True(role.All(x => result.Roles.Select(x => x.Id).Contains(x.Id)));
+        Assert.True(role.All(x => result.Roles.Select(x => x.Name).Contains(x.Name)));
+        Assert.True(role.All(x => result.Roles.Select(x => x.Description).Contains(x.Description)));
     }
 
     [Fact]
@@ -126,11 +128,10 @@ public sealed class GetUserByIdQueryHandlerTests
 
     [Fact]
     [Trait("Users", "Queries/GetUserByIdQueryHandler/Handle")]
-    public async Task Handle_ShouldThrowException_WhenUserIsDeleted()
+    public async Task Handle_ShouldReturnNull_WhenUserIsDeleted()
     {
         // Arrange
         var user = UserTestFactory.CreateUser();
-
         user.SetIsDeleted(true, new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero)); // Deleted 1 Day from creation date
 
         var mockUserRepository = new Mock<IUserRepository>();
