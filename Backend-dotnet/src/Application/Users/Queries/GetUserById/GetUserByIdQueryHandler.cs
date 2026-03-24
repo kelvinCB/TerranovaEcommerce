@@ -60,5 +60,4 @@ public sealed class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, 
 
         return UserDto.FromDomain(user, roles);
     }
-    
 }

@@ -17,13 +17,10 @@ public sealed class RoleDto
     /// </summary>
     /// <param name="role">The Role entity to convert.</param>
     /// <returns>Returns a RoleDto.</returns>
-    public static RoleDto FromDomain(Role role)
+    public static RoleDto FromDomain(Role role) => new RoleDto
     {
-        return new RoleDto
-        {
-            Id = role.Id,
-            Name = role.Name,
-            Description = role.Description
-        };
-    }
+        Id = role.Id,
+        Name = role.Name,
+        Description = role.Description
+    };
 }

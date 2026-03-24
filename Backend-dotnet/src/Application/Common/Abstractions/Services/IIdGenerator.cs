@@ -5,9 +5,9 @@ namespace Application.Common.Abstractions.Services;
 /// </summary>
 public interface IIdGenerator
 {
-  /// <summary>
-  /// Generates a new ULID.
-  /// </summary>
-  /// <returns>Returns a new ULID.</returns>
-  public Ulid NewUlid();
+    /// <summary>
+    /// Generates a new ULID.
+    /// </summary>
+    /// <returns>Returns a new ULID.</returns>
+    public Ulid NewUlid();
 }

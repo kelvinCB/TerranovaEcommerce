@@ -5,6 +5,7 @@
 # Build
 **/bin/
 **/obj/
+**/.dotnet/
 
 # Visual Studio
 **/.vs/

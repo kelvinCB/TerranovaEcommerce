@@ -52,7 +52,7 @@ public sealed class GetUserByEmailQueryHandler : IRequestHandler<GetUserByEmailQ
         {
             return null;
         }
-        
+
         var roles = await _userRoleRepository.GetByUserIdAsync(user.Id, cancellationToken);
 
         if (!roles.Any())
