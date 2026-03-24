@@ -83,5 +83,5 @@ public class UserRoleTest
 
         Assert.Contains("Must be in UTC", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
-    
+
 }
