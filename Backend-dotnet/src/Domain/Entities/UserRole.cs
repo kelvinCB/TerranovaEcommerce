@@ -44,5 +44,5 @@ public class UserRole
             timestamp
         );
     }
-    
+
 }

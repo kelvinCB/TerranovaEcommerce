@@ -51,8 +51,8 @@ public class Cart
         Guard.EnsureUtc(timestamp, nameof(timestamp));
 
         return new Cart(
-            id, 
-            userId, 
+            id,
+            userId,
             createdAt: timestamp,
             updatedAt: timestamp
         );
