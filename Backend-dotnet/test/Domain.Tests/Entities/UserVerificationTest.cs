@@ -48,11 +48,11 @@ public class UserVerificationTest
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(
             () => UserVerification.Create(
-                id, 
-                userId, 
-                purpose, 
-                verificationCode, 
-                expiresAt, 
+                id,
+                userId,
+                purpose,
+                verificationCode,
+                expiresAt,
                 createdAt
             )
         );
@@ -75,11 +75,11 @@ public class UserVerificationTest
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(
             () => UserVerification.Create(
-                id, 
-                userId, 
-                purpose, 
-                verificationCode, 
-                expiresAt, 
+                id,
+                userId,
+                purpose,
+                verificationCode,
+                expiresAt,
                 createdAt
             )
         );
@@ -102,11 +102,11 @@ public class UserVerificationTest
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(
             () => UserVerification.Create(
-                id, 
-                userId, 
+                id,
+                userId,
                 purpose!, // Force non-null value for testing 
-                verificationCode, 
-                expiresAt, 
+                verificationCode,
+                expiresAt,
                 createdAt
             )
         );
@@ -129,11 +129,11 @@ public class UserVerificationTest
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(
             () => UserVerification.Create(
-                id, 
-                userId, 
-                purpose, 
-                verificationCode, 
-                expiresAt, 
+                id,
+                userId,
+                purpose,
+                verificationCode,
+                expiresAt,
                 createdAt
             )
         );
@@ -156,11 +156,11 @@ public class UserVerificationTest
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(
             () => UserVerification.Create(
-                id, 
-                userId, 
-                purpose, 
+                id,
+                userId,
+                purpose,
                 verificationCode!, // Force non-null value for testing 
-                expiresAt, 
+                expiresAt,
                 createdAt
             )
         );
@@ -183,11 +183,11 @@ public class UserVerificationTest
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(
             () => UserVerification.Create(
-                id, 
-                userId, 
-                purpose, 
-                verificationCode, 
-                expiresAt, 
+                id,
+                userId,
+                purpose,
+                verificationCode,
+                expiresAt,
                 createdAt
             )
         );
@@ -210,11 +210,11 @@ public class UserVerificationTest
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(
             () => UserVerification.Create(
-                id, 
-                userId, 
-                purpose, 
-                verificationCode, 
-                expiresAt, 
+                id,
+                userId,
+                purpose,
+                verificationCode,
+                expiresAt,
                 createdAt
             )
         );
@@ -237,11 +237,11 @@ public class UserVerificationTest
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(
             () => UserVerification.Create(
-                id, 
-                userId, 
-                purpose, 
-                verificationCode, 
-                expiresAt, 
+                id,
+                userId,
+                purpose,
+                verificationCode,
+                expiresAt,
                 createdAt
             )
         );
@@ -264,11 +264,11 @@ public class UserVerificationTest
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(
             () => UserVerification.Create(
-                id, 
-                userId, 
-                purpose, 
-                verificationCode, 
-                expiresAt, 
+                id,
+                userId,
+                purpose,
+                verificationCode,
+                expiresAt,
                 createdAt
             )
         );
@@ -291,11 +291,11 @@ public class UserVerificationTest
         // Act & Assert
         var exception = Assert.Throws<ArgumentException>(
             () => UserVerification.Create(
-                id, 
-                userId, 
-                purpose, 
-                verificationCode, 
-                expiresAt, 
+                id,
+                userId,
+                purpose,
+                verificationCode,
+                expiresAt,
                 createdAt
             )
         );

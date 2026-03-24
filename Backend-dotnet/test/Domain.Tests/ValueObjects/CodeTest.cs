@@ -76,5 +76,5 @@ public class CodeTest
         // Assert
         Assert.Equal("Code(****)", result);
     }
-    
+
 }
