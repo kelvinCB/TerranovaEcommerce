@@ -15,5 +15,6 @@ trim_trailing_whitespace = false
 [*.cs]
 indent_style = space
 indent_size = 4
+tab_width = 4
 csharp_style_namespace_declarations = file_scoped:error
 csharp_new_line_before_open_brace = all

@@ -13,7 +13,7 @@ namespace Application.Users.Commands.RegisterUser;
 /// <remarks>Mediator pattern is used to handle the command and return the user ID.</remarks>
 public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, Ulid>
 {
-    // Dependencies
+    // Dependency injection
     private readonly IUserRepository _userRepository;
     private readonly IRoleRepository _roleRepository;
     private readonly IUserRoleRepository _userRoleRepository;
@@ -26,13 +26,13 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
     /// Initializes a new instance of the <see cref="RegisterUserCommandHandler"/> class.
     /// </summary>
     /// <param name="userRepository">The user repository.</param>
-    /// <param name="passwordHasher">The password hasher service.</param>
+    /// <param name="roleRepository">The role repository.</param>
     /// <param name="userRoleRepository">The user role repository.</param>
+    /// <param name="passwordHasher">The password hasher service.</param>
     /// <param name="dateTimeProvider">The date-time provider service.</param>
     /// <param name="idGenerator">The ID generator service.</param>
-    /// <param name="roleRepository">The role repository.</param>
     /// <param name="unitOfWork">The unit of work service.</param>
-    /// <exception cref="ArgumentNullException">Thrown when the user repository, role repository, password hasher, date-time provider or ID generator is null.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when any of the dependencies is null.</exception>
     public RegisterUserCommandHandler(
         IUserRepository userRepository,
         IRoleRepository roleRepository,
@@ -77,10 +77,10 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
         var user = CreateUser(request, userId, passwordHash, email, phoneNumber, timestamp);
 
         var existingRoles = await GetValidatedRolesAsync(request.RoleIds, cancellationToken);
-        var userRole = CreateUserRoles(userId, existingRoles, timestamp);
+        var userRoles = CreateUserRoles(userId, existingRoles, timestamp);
 
         await _userRepository.RegisterAsync(user, cancellationToken);
-        await _userRoleRepository.AssignRolesToUserAsync(userRole, cancellationToken);
+        await _userRoleRepository.AssignRolesToUserAsync(userRoles, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return user.Id;
@@ -88,7 +88,10 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
 
     // Private methods
     
-    private void EnsureRolesProvided(IReadOnlyCollection<Ulid> roleIds) => AtLeastOneRoleMustBeProvidedException.ThrowIfNullOrEmpty(roleIds);
+    private void EnsureRolesProvided(IReadOnlyCollection<Ulid> roleIds)
+    {
+        AtLeastOneRoleMustBeProvidedException.ThrowIfNullOrEmpty(roleIds);
+    }
 
     private async Task EnsureEmailIsAvailableAsync(Email email, CancellationToken cancellationToken)
     {
@@ -99,9 +102,15 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
         }
     }
 
-    private PhoneNumber? CreatePhoneNumber(string? phoneNumber) => string.IsNullOrWhiteSpace(phoneNumber) ? default : PhoneNumber.Create(phoneNumber);
+    private PhoneNumber? CreatePhoneNumber(string? phoneNumber)
+    {
+        return string.IsNullOrWhiteSpace(phoneNumber) ? default : PhoneNumber.Create(phoneNumber);
+    }
 
-    private PasswordHash CreatePasswordHash(string password) => PasswordHash.From(_passwordHasher.HashPassword(password));
+    private PasswordHash CreatePasswordHash(string password)
+    {
+        return PasswordHash.From(_passwordHasher.HashPassword(password));
+    }
 
     private User CreateUser(RegisterUserCommand request, Ulid userId, PasswordHash passwordHash, Email email, PhoneNumber? phoneNumber, DateTimeOffset timestamp)
     {
@@ -136,8 +145,8 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
 
     private IReadOnlyCollection<UserRole> CreateUserRoles(Ulid userId, IReadOnlyCollection<Ulid> roleIds, DateTimeOffset timestamp)
     {
-        var userRole = roleIds.Select(roleId => UserRole.Create(userId, roleId, timestamp)).ToArray();
+        var userRoles = roleIds.Select(roleId => UserRole.Create(userId, roleId, timestamp)).ToArray();
 
-        return userRole;
+        return userRoles;
     }
 }
