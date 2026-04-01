@@ -13,4 +13,8 @@ public interface IRefreshTokenRepository
     /// <param name="refreshToken">The refresh token to add.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
     Task AddAsync(RefreshToken refreshToken, CancellationToken cancellationToken);
+
+    Task<RefreshToken?> GetByTokenHashAsync(string tokenHash, CancellationToken cancellationToken);
+
+    Task UpdateAsync(RefreshToken refreshToken, CancellationToken cancellationToken);
 }
