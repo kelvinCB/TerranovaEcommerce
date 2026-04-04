@@ -368,7 +368,7 @@ public sealed class RefreshSessionCommandHandlerTests
             mockDateTimeProvider,
             mockTokenHashService);
 
-        await Assert.ThrowsAsync<RefreshTokenNotFoundException>(() => handler.Handle(command, CancellationToken.None));
+        await Assert.ThrowsAsync<InvalidCredentialsException>(() => handler.Handle(command, CancellationToken.None));
 
         mockUserRepository.Verify(x => x.GetByIdAsync(It.IsAny<Ulid>(), It.IsAny<CancellationToken>()), Times.Never);
         mockUserRoleRepository.Verify(x => x.GetByUserIdAsync(It.IsAny<Ulid>(), It.IsAny<CancellationToken>()), Times.Never);
@@ -455,7 +455,7 @@ public sealed class RefreshSessionCommandHandlerTests
             mockDateTimeProvider,
             mockTokenHashService);
 
-        await Assert.ThrowsAsync<UserNotFoundException>(() => handler.Handle(command, CancellationToken.None));
+        await Assert.ThrowsAsync<InvalidCredentialsException>(() => handler.Handle(command, CancellationToken.None));
 
         mockUserRoleRepository.Verify(x => x.GetByUserIdAsync(It.IsAny<Ulid>(), It.IsAny<CancellationToken>()), Times.Never);
         mockRefreshTokenRepository.Verify(x => x.UpdateAsync(It.IsAny<RefreshTokenEntity>(), It.IsAny<CancellationToken>()), Times.Never);
@@ -500,7 +500,7 @@ public sealed class RefreshSessionCommandHandlerTests
             mockDateTimeProvider,
             mockTokenHashService);
 
-        await Assert.ThrowsAsync<UserAlreadyDeletedException>(() => handler.Handle(command, CancellationToken.None));
+        await Assert.ThrowsAsync<InvalidCredentialsException>(() => handler.Handle(command, CancellationToken.None));
 
         mockUserRoleRepository.Verify(x => x.GetByUserIdAsync(It.IsAny<Ulid>(), It.IsAny<CancellationToken>()), Times.Never);
         mockRefreshTokenRepository.Verify(x => x.UpdateAsync(It.IsAny<RefreshTokenEntity>(), It.IsAny<CancellationToken>()), Times.Never);
