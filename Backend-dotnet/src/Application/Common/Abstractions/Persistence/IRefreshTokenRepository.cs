@@ -28,4 +28,12 @@ public interface IRefreshTokenRepository
     /// <param name="refreshToken">The refresh token to update.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
     Task UpdateAsync(RefreshToken refreshToken, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Revokes all refresh tokens for a specific user.
+    /// </summary>
+    /// <param name="userId">The ID of the user whose refresh tokens are to be revoked.</param>
+    /// <param name="revokedAt">The date and time at which the tokens are revoked.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    Task RevokeAllForUserAsync(Ulid userId, DateTimeOffset revokedAt, CancellationToken cancellationToken);
 }
