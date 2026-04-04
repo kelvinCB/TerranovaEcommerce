@@ -14,7 +14,7 @@ public class UserVerificationTest
         // Arrange
         var id = Ulid.NewUlid();
         var userId = Ulid.NewUlid();
-        var purpose = "email_verify";
+        var purpose = UserVerificationPurpose.EmailVerify;
         var verificationCode = Code.From("123456"); // Minimum code length is 6
         var expiresAt = new DateTimeOffset(2026, 1, 1, 0, 5, 0, TimeSpan.Zero); // 5 minutes after creation time
         var createdAt = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
@@ -40,7 +40,7 @@ public class UserVerificationTest
         // Arrange
         var id = Ulid.Empty; // Uninitialized
         var userId = Ulid.NewUlid();
-        var purpose = "email_verify";
+        var purpose = UserVerificationPurpose.EmailVerify;
         var verificationCode = Code.From("123456"); // minimum code length is 6
         var expiresAt = new DateTimeOffset(2026, 1, 1, 0, 5, 0, TimeSpan.Zero); // 5 minutes after creation time
         var createdAt = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
@@ -67,7 +67,7 @@ public class UserVerificationTest
         // Arrange
         var id = Ulid.NewUlid();
         var userId = Ulid.Empty; // Uninitialized
-        var purpose = "email_verify";
+        var purpose = UserVerificationPurpose.EmailVerify;
         var verificationCode = Code.From("123456"); // minimum code length is 6
         var expiresAt = new DateTimeOffset(2026, 1, 1, 0, 5, 0, TimeSpan.Zero); // 5 minutes after creation time
         var createdAt = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
@@ -94,7 +94,7 @@ public class UserVerificationTest
         // Arrange
         var id = Ulid.NewUlid();
         var userId = Ulid.NewUlid();
-        var purpose = default(string); // Incorrect value
+        var purpose = default(UserVerificationPurpose); // Incorrect value
         var verificationCode = Code.From("123456"); // minimum code length is 6
         var expiresAt = new DateTimeOffset(2026, 1, 1, 0, 5, 0, TimeSpan.Zero); // 5 minutes after creation time
         var createdAt = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
@@ -116,39 +116,12 @@ public class UserVerificationTest
 
     [Fact]
     [Trait("UserVerification", "Create")]
-    public void Create_ShouldThrowException_WhenPurposeIsWhiteSpace()
-    {
-        // Arrange
-        var id = Ulid.NewUlid();
-        var userId = Ulid.NewUlid();
-        var purpose = "   "; // Incorrect value
-        var verificationCode = Code.From("123456"); // minimum code length is 6
-        var expiresAt = new DateTimeOffset(2026, 1, 1, 0, 5, 0, TimeSpan.Zero); // 5 minutes after creation time
-        var createdAt = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
-
-        // Act & Assert
-        var exception = Assert.Throws<ArgumentException>(
-            () => UserVerification.Create(
-                id,
-                userId,
-                purpose,
-                verificationCode,
-                expiresAt,
-                createdAt
-            )
-        );
-
-        Assert.Contains("Cannot be null or whitespace", exception.Message, StringComparison.OrdinalIgnoreCase);
-    }
-
-    [Fact]
-    [Trait("UserVerification", "Create")]
     public void Create_ShouldThrowException_WhenVerificationCodeIsNull()
     {
         // Arrange
         var id = Ulid.NewUlid();
         var userId = Ulid.NewUlid();
-        var purpose = "email_verify";
+        var purpose = UserVerificationPurpose.EmailVerify;
         var verificationCode = default(Code); // Incorrect value
         var expiresAt = new DateTimeOffset(2026, 1, 1, 0, 5, 0, TimeSpan.Zero); // 5 minutes after creation time
         var createdAt = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
@@ -175,7 +148,7 @@ public class UserVerificationTest
         // Arrange
         var id = Ulid.NewUlid();
         var userId = Ulid.NewUlid();
-        var purpose = "email_verify";
+        var purpose = UserVerificationPurpose.EmailVerify;
         var verificationCode = Code.From("123456"); // minimum code length is 6
         var expiresAt = default(DateTimeOffset); // Incorrect value
         var createdAt = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
@@ -202,7 +175,7 @@ public class UserVerificationTest
         // Arrange
         var id = Ulid.NewUlid();
         var userId = Ulid.NewUlid();
-        var purpose = "email_verify";
+        var purpose = UserVerificationPurpose.EmailVerify;
         var verificationCode = Code.From("123456"); // minimum code length is 6
         var expiresAt = new DateTimeOffset(2026, 1, 1, 0, 5, 0, TimeSpan.FromHours(-4)); // It's not UTC
         var createdAt = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
@@ -229,7 +202,7 @@ public class UserVerificationTest
         // Arrange
         var id = Ulid.NewUlid();
         var userId = Ulid.NewUlid();
-        var purpose = "email_verify";
+        var purpose = UserVerificationPurpose.EmailVerify;
         var verificationCode = Code.From("123456"); // minimum code length is 6
         var expiresAt = new DateTimeOffset(2026, 1, 1, 0, 5, 0, TimeSpan.Zero); // 5 minutes after creation time
         var createdAt = default(DateTimeOffset);
@@ -256,7 +229,7 @@ public class UserVerificationTest
         // Arrange
         var id = Ulid.NewUlid();
         var userId = Ulid.NewUlid();
-        var purpose = "email_verify";
+        var purpose = UserVerificationPurpose.EmailVerify;
         var verificationCode = Code.From("123456"); // minimum code length is 6
         var expiresAt = new DateTimeOffset(2026, 1, 1, 0, 5, 0, TimeSpan.Zero); // 5 minutes after creation time
         var createdAt = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4)); // It's not UTC
@@ -283,7 +256,7 @@ public class UserVerificationTest
         // Arrange
         var id = Ulid.NewUlid();
         var userId = Ulid.NewUlid();
-        var purpose = "email_verify";
+        var purpose = UserVerificationPurpose.EmailVerify;
         var verificationCode = Code.From("123456"); // minimum code length is 6
         var expiresAt = new DateTimeOffset(2026, 1, 1, 0, 5, 0, TimeSpan.Zero); // 5 minutes after creation time
         var createdAt = new DateTimeOffset(2026, 1, 1, 0, 10, 0, TimeSpan.Zero); // 10 minutes after creation time
