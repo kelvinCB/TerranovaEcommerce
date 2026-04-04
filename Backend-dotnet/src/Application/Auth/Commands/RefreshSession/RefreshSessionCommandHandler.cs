@@ -32,7 +32,7 @@ public sealed class RefreshSessionCommandHandler : IRequestHandler<RefreshSessio
     /// <param name="authSessionService">The authentication session service.</param>
     /// <param name="dateTimeProvider">The date time provider.</param>
     /// <param name="tokenHashService">The token hash service.</param>
-    /// <exception cref="ArgumentNullException">Thrown when any of the dependencies is null</exception>
+    /// <exception cref="ArgumentNullException">Thrown when any of the dependencies is null.</exception>
     public RefreshSessionCommandHandler(
         IRefreshTokenRepository refreshTokenRepository,
         IUnitOfWork unitOfWork,
@@ -54,14 +54,12 @@ public sealed class RefreshSessionCommandHandler : IRequestHandler<RefreshSessio
     /// <summary>
     /// Handles the refresh session command.
     /// </summary>
-    /// <param name="request">The refresh token command</param>
-    /// <param name="cancellationToken">The cancellation token</param>
-    /// <returns>The authentication session DTO</returns>
-    /// <exception cref="RefreshTokenNotFoundException">Thrown when the refresh token is not found</exception>
-    /// <exception cref="RefreshTokenNotActiveException">Thrown when the refresh token is not active</exception>
-    /// <exception cref="UserNotFoundException">Thrown when the user associated with the refresh token is not found</exception>
-    /// <exception cref="UserAlreadyDeletedException">Thrown when the user associated with the refresh token is already deleted</exception>
-    /// <exception cref="UserMustHaveAtLeastOneRoleException">Thrown when the user associated with the refresh token does not have any roles</exception>
+    /// <param name="request">The refresh token command.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The authentication session DTO.</returns>
+    /// <exception cref="InvalidCredentialsException">Thrown when the credentials are invalid.</exception>
+    /// <exception cref="RefreshTokenNotActiveException">Thrown when the refresh token is not active.</exception>
+    /// <exception cref="UserMustHaveAtLeastOneRoleException">Thrown when the user associated with the refresh token does not have any roles.</exception>
     public async Task<AuthSessionDto> Handle(RefreshSessionCommand request, CancellationToken cancellationToken)
     {
         var hashedToken = _tokenHashService.HashToken(request.RefreshToken);
@@ -69,7 +67,7 @@ public sealed class RefreshSessionCommandHandler : IRequestHandler<RefreshSessio
 
         if (refreshToken is null)
         {
-            throw new RefreshTokenNotFoundException();
+            throw new InvalidCredentialsException();
         }
 
         var now = _dateTimeProvider.Timestamp;
@@ -108,12 +106,12 @@ public sealed class RefreshSessionCommandHandler : IRequestHandler<RefreshSessio
 
         if (user is null)
         {
-            throw new UserNotFoundException(userId);
+            throw new InvalidCredentialsException();
         }
 
         if (user.IsDeleted)
         {
-            throw new UserAlreadyDeletedException(userId);
+            throw new InvalidCredentialsException();
         }
 
         return user;
