@@ -10,7 +10,7 @@ public class UserVerification
 {
     public Ulid Id { get; private set; }
     public Ulid UserId { get; private set; }
-    public string Purpose { get; private set; } = null!;
+    public UserVerificationPurpose Purpose { get; private set; } = null!;
     public Code VerificationCode { get; private set; } = null!;
     public DateTimeOffset ExpiresAt { get; private set; }
     public DateTimeOffset? ConsumedAt { get; private set; }
@@ -31,7 +31,7 @@ public class UserVerification
     private UserVerification(
         Ulid id,
         Ulid userId,
-        string purpose,
+        UserVerificationPurpose purpose,
         Code verificationCode,
         DateTimeOffset expiresAt,
         DateTimeOffset createdAt
@@ -58,7 +58,7 @@ public class UserVerification
     public static UserVerification Create(
         Ulid id,
         Ulid userId,
-        string purpose,
+        UserVerificationPurpose purpose,
         Code verificationCode,
         DateTimeOffset expiresAt,
         DateTimeOffset createdAt
@@ -67,7 +67,7 @@ public class UserVerification
         // Perform validations using the Guard class to ensure domain invariants are maintained
         Guard.EnsureUlidNotEmpty(id, nameof(id));
         Guard.EnsureUlidNotEmpty(userId, nameof(userId));
-        Guard.EnsureStringNotNullOrWhiteSpace(purpose, nameof(purpose));
+        Guard.EnsureNotNull(purpose, nameof(purpose));
         Guard.EnsureNotNull(verificationCode, nameof(verificationCode));
         Guard.EnsureUtc(expiresAt, nameof(expiresAt));
         Guard.EnsureUtc(createdAt, nameof(createdAt));

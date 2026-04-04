@@ -10,7 +10,7 @@ public static class UserVerificationTestFactory
         return UserVerification.Create(
             id: Ulid.NewUlid(),
             userId: Ulid.NewUlid(),
-            purpose: "email_verify",
+            purpose: UserVerificationPurpose.EmailVerify,
             verificationCode: Code.From("123456"),
             expiresAt: new DateTimeOffset(2022, 1, 1, 0, 5, 0, TimeSpan.Zero),
             createdAt: new DateTimeOffset(2022, 1, 1, 0, 0, 0, TimeSpan.Zero)
