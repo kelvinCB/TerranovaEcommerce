@@ -1,6 +1,5 @@
 using Application.Common.Abstractions.Persistence;
 using Application.Common.Abstractions.Services;
-using Application.Common.Exceptions;
 using MediatR;
 
 namespace Application.Auth.Commands.Logout;
@@ -43,7 +42,6 @@ public sealed class LogoutCommandHandler : IRequestHandler<LogoutCommand, Unit>
     /// <param name="request">The logout command.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    /// <exception cref="RefreshTokenNotFoundException">Thrown when the refresh token is not found.</exception>
     public async Task<Unit> Handle(LogoutCommand request, CancellationToken cancellationToken)
     {
         var tokenHash = _tokenHashService.HashToken(request.RefreshToken);
@@ -52,7 +50,7 @@ public sealed class LogoutCommandHandler : IRequestHandler<LogoutCommand, Unit>
 
         if (refreshToken is null)
         {
-            throw new RefreshTokenNotFoundException();
+            return Unit.Value;
         }
 
         var now = _dateTimeProvider.Timestamp;
