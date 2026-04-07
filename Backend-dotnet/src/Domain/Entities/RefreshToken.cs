@@ -99,11 +99,16 @@ public class RefreshToken
     /// Revokes the refresh token by updating the IsRevoked and RevokedAt properties
     /// </summary>
     /// <param name="timestamp">The timestamp when the refresh token was revoked</param>
-    /// <exception cref="InvalidOperationException">Thrown when the refresh token is already revoked</exception>
+    /// <remarks>
+    /// This method will be idempotent, meaning that if the refresh token is already revoked,
+    /// it will not throw an exception.
+    /// </remarks>
     public void Revoke(DateTimeOffset timestamp)
     {
         if (IsRevoked)
-            throw new InvalidOperationException("The refresh token is already revoked.");
+        {
+            return;
+        }
 
         // Perform validations using the Guard class to ensure domain invariants are maintained
         Guard.EnsureUtc(timestamp, nameof(timestamp));
@@ -118,11 +123,16 @@ public class RefreshToken
     /// </summary>
     /// <param name="timestamp">The timestamp when the refresh token was revoked</param>
     /// <param name="newTokenId">The new refresh token identifier to replace the revoked token</param>
-    /// <exception cref="InvalidOperationException">Thrown when the refresh token is already revoked</exception>
+    /// <remarks>
+    /// This method will be idempotent, meaning that if the refresh token is already revoked,
+    /// it will not throw an exception.
+    /// </remarks>
     public void RevokeByRotation(DateTimeOffset timestamp, Ulid newTokenId)
     {
         if (IsRevoked)
-            throw new InvalidOperationException("The refresh token is already revoked.");
+        {
+            return;
+        }
 
         // Perform validations using the Guard class to ensure domain invariants are maintained
         Guard.EnsureUtc(timestamp, nameof(timestamp));
