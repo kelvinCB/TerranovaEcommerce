@@ -1,7 +1,6 @@
 using Application.Auth.Commands.Logout;
 using Application.Common.Abstractions.Persistence;
 using Application.Common.Abstractions.Services;
-using Application.Common.Exceptions;
 using Common.Tests.Factories;
 using Moq;
 using MediatR;
@@ -180,7 +179,7 @@ public sealed class LogoutCommandHandlerTests
 
     [Fact]
     [Trait("Auth", "Commands/Logout/LogoutCommandHandler/Handle")]
-    public async Task Handle_ShouldThrowException_WhenRefreshTokenDoesNotExist()
+    public async Task Handle_ShouldReturnUnit_WhenRefreshTokenDoesNotExist()
     {
         var command = CreateCommand();
         var tokenHash = "hashed-refresh-token";
@@ -203,8 +202,9 @@ public sealed class LogoutCommandHandlerTests
             mockDateTimeProvider,
             mockTokenHashService);
 
-        await Assert.ThrowsAsync<RefreshTokenNotFoundException>(() => handler.Handle(command, CancellationToken.None));
+        var result = await handler.Handle(command, CancellationToken.None);
 
+        Assert.Equal(Unit.Value, result);
         mockDateTimeProvider.Verify(x => x.Timestamp, Times.Never);
         mockRefreshTokenRepository.Verify(x => x.UpdateAsync(It.IsAny<Domain.Entities.RefreshToken>(), It.IsAny<CancellationToken>()), Times.Never);
         mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
@@ -212,12 +212,13 @@ public sealed class LogoutCommandHandlerTests
 
     [Fact]
     [Trait("Auth", "Commands/Logout/LogoutCommandHandler/Handle")]
-    public async Task Handle_ShouldThrowException_WhenRefreshTokenIsAlreadyRevoked()
+    public async Task Handle_ShouldUpdateRefreshToken_WhenRefreshTokenIsAlreadyRevoked()
     {
         var command = CreateCommand();
         var refreshToken = RefreshTokenTestFactory.CreateRefreshToken();
         var tokenHash = "hashed-refresh-token";
-        refreshToken.Revoke(new DateTimeOffset(2026, 1, 2, 0, 0, 0, TimeSpan.Zero));
+        var revokedAt = new DateTimeOffset(2026, 1, 2, 0, 0, 0, TimeSpan.Zero);
+        refreshToken.Revoke(revokedAt);
 
         var mockRefreshTokenRepository = new Mock<IRefreshTokenRepository>();
         var mockUnitOfWork = new Mock<IUnitOfWork>();
@@ -234,9 +235,12 @@ public sealed class LogoutCommandHandlerTests
             mockDateTimeProvider,
             mockTokenHashService);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => handler.Handle(command, CancellationToken.None));
+        var result = await handler.Handle(command, CancellationToken.None);
 
-        mockRefreshTokenRepository.Verify(x => x.UpdateAsync(It.IsAny<Domain.Entities.RefreshToken>(), It.IsAny<CancellationToken>()), Times.Never);
-        mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+        Assert.Equal(Unit.Value, result);
+        Assert.True(refreshToken.IsRevoked);
+        Assert.Equal(revokedAt, refreshToken.RevokedAt);
+        mockRefreshTokenRepository.Verify(x => x.UpdateAsync(refreshToken, CancellationToken.None), Times.Once);
+        mockUnitOfWork.Verify(x => x.SaveChangesAsync(CancellationToken.None), Times.Once);
     }
 }
