@@ -324,17 +324,21 @@ public class RefreshTokenTest
 
     [Fact]
     [Trait("RefreshToken", "Revoke")]
-    public void Revoke_ShouldThrowException_WhenTokenIsAlreadyRevoked()
+    public void Revoke_ShouldBeIdempotent_WhenTokenIsAlreadyRevoked()
     {
         // Arrange
         var refreshToken = RefreshTokenTestFactory.CreateRefreshToken();
-        refreshToken.Revoke(refreshToken.CreatedAt.AddDays(1)); // Revoke the token 1 day after creation
-        var timestamp = refreshToken.CreatedAt.AddDays(5); // 5 days after creations
+        var firstRevokedAt = refreshToken.CreatedAt.AddDays(1);
+        var secondTimestamp = refreshToken.CreatedAt.AddDays(5);
+        refreshToken.Revoke(firstRevokedAt); // Revoke the token 1 day after creation
 
-        // Act and Assert
-        var exception = Assert.Throws<InvalidOperationException>(() => refreshToken.Revoke(timestamp));
+        // Act
+        var exception = Record.Exception(() => refreshToken.Revoke(secondTimestamp));
 
-        Assert.Contains("The refresh token is already revoked.", exception.Message, StringComparison.OrdinalIgnoreCase);
+        // Assert
+        Assert.Null(exception);
+        Assert.True(refreshToken.IsRevoked);
+        Assert.Equal(firstRevokedAt, refreshToken.RevokedAt);
     }
 
     [Fact]
@@ -401,19 +405,24 @@ public class RefreshTokenTest
 
     [Fact]
     [Trait("RefreshToken", "RevokeByRotation")]
-    public void RevokeByRotation_ShouldThrowException_WhenTokenIsAlreadyRevoked()
+    public void RevokeByRotation_ShouldBeIdempotent_WhenTokenIsAlreadyRevoked()
     {
         // Arrange
         var refreshToken = RefreshTokenTestFactory.CreateRefreshToken();
-        refreshToken.RevokeByRotation(refreshToken.CreatedAt, Ulid.NewUlid()); // Revoke the token
+        var firstTimestamp = refreshToken.CreatedAt;
+        var firstNewTokenId = Ulid.NewUlid();
+        var secondTimestamp = refreshToken.CreatedAt.AddDays(5);
+        var secondNewTokenId = Ulid.NewUlid();
+        refreshToken.RevokeByRotation(firstTimestamp, firstNewTokenId); // Revoke the token
 
-        var revokedAt = refreshToken.CreatedAt.AddDays(5); // 5 days after creations
-        var newTokenId = Ulid.NewUlid(); // Create a new token that replaced the revoked token
+        // Act
+        var exception = Record.Exception(() => refreshToken.RevokeByRotation(secondTimestamp, secondNewTokenId));
 
-        // Act and Assert
-        var exception = Assert.Throws<InvalidOperationException>(() => refreshToken.RevokeByRotation(revokedAt, newTokenId));
-
-        Assert.Contains("The refresh token is already revoked.", exception.Message, StringComparison.OrdinalIgnoreCase);
+        // Assert
+        Assert.Null(exception);
+        Assert.True(refreshToken.IsRevoked);
+        Assert.Equal(firstTimestamp, refreshToken.RevokedAt);
+        Assert.Equal(firstNewTokenId, refreshToken.ReplacedByTokenId);
     }
 
     [Fact]
