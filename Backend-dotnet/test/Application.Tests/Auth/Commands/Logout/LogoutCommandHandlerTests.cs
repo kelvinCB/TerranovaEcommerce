@@ -212,7 +212,7 @@ public sealed class LogoutCommandHandlerTests
 
     [Fact]
     [Trait("Auth", "Commands/Logout/LogoutCommandHandler/Handle")]
-    public async Task Handle_ShouldUpdateRefreshToken_WhenRefreshTokenIsAlreadyRevoked()
+    public async Task Handle_ShouldReturnUnit_WhenRefreshTokenIsAlreadyRevoked()
     {
         var command = CreateCommand();
         var refreshToken = RefreshTokenTestFactory.CreateRefreshToken();
@@ -240,7 +240,8 @@ public sealed class LogoutCommandHandlerTests
         Assert.Equal(Unit.Value, result);
         Assert.True(refreshToken.IsRevoked);
         Assert.Equal(revokedAt, refreshToken.RevokedAt);
-        mockRefreshTokenRepository.Verify(x => x.UpdateAsync(refreshToken, CancellationToken.None), Times.Once);
-        mockUnitOfWork.Verify(x => x.SaveChangesAsync(CancellationToken.None), Times.Once);
+        mockDateTimeProvider.Verify(x => x.Timestamp, Times.Never);
+        mockRefreshTokenRepository.Verify(x => x.UpdateAsync(It.IsAny<Domain.Entities.RefreshToken>(), It.IsAny<CancellationToken>()), Times.Never);
+        mockUnitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
 }

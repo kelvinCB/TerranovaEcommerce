@@ -48,7 +48,7 @@ public sealed class LogoutCommandHandler : IRequestHandler<LogoutCommand, Unit>
 
         var refreshToken = await _refreshTokenRepository.GetByTokenHashAsync(tokenHash, cancellationToken);
 
-        if (refreshToken is null)
+        if (refreshToken is null || refreshToken.IsRevoked)
         {
             return Unit.Value;
         }
