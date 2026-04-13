@@ -12,7 +12,6 @@ namespace Application.Auth.Commands.VerifyPasswordResetCode;
 public sealed class VerifyPasswordResetCodeCommandHandler : IRequestHandler<VerifyPasswordResetCodeCommand, bool>
 {
     // Dependencies
-    private readonly IUnitOfWork _unitOfWork;
     private readonly IUserRepository _userRepository;
     private readonly IUserVerificationRepository _userVerificationRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
@@ -20,19 +19,16 @@ public sealed class VerifyPasswordResetCodeCommandHandler : IRequestHandler<Veri
     /// <summary>
     /// Initializes a new instance of the <see cref="VerifyPasswordResetCodeCommandHandler"/> class with the specified dependencies.
     /// </summary>
-    /// <param name="unitOfWork">The unit of work.</param>
     /// <param name="userRepository">The user repository.</param>
     /// <param name="userVerificationRepository">The user verification repository.</param>
     /// <param name="dateTimeProvider">The date time provider.</param>
     /// <exception cref="ArgumentNullException">Thrown when any of the dependencies is null.</exception>
     public VerifyPasswordResetCodeCommandHandler(
-        IUnitOfWork unitOfWork,
         IUserRepository userRepository,
         IUserVerificationRepository userVerificationRepository,
         IDateTimeProvider dateTimeProvider
     )
     {
-        _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         _userVerificationRepository = userVerificationRepository ?? throw new ArgumentNullException(nameof(userVerificationRepository));
         _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
@@ -65,10 +61,6 @@ public sealed class VerifyPasswordResetCodeCommandHandler : IRequestHandler<Veri
         {
             return false;
         }
-
-        userVerification.Consume(now);
-        await _userVerificationRepository.UpdateAsync(userVerification, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return true;
     }
