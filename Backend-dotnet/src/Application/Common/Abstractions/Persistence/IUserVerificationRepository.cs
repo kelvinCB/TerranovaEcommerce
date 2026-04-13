@@ -9,35 +9,35 @@ namespace Application.Common.Abstractions.Persistence;
 public interface IUserVerificationRepository
 {
     /// <summary>
-    /// Retrieves a user verification record by user ID and verification purpose.
+    /// Retrieves an active verification for the specified user and purpose.
     /// </summary>
-    /// <param name="userId">The ID of the user for whom to retrieve verification information.</param>
-    /// <param name="purpose">The purpose of the verification to retrieve.</param>
-    /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
-    /// <returns>The user verification record if found, otherwise null.</returns>
-    Task<UserVerification?> GetByUserIdAndTypeAsync(Ulid userId, UserVerificationPurpose purpose, CancellationToken cancellationToken);
+    /// <param name="userId">The user identifier.</param>
+    /// <param name="purpose">The verification purpose.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    /// <returns>The active verification if found; otherwise, null.</returns>
+    Task<UserVerification?> GetActiveByUserIdAndPurposeAsync(Ulid userId, UserVerificationPurpose purpose, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Checks if there is an active verification for a user with the specified purpose.
+    /// Determines whether an active verification exists for the specified user and purpose.
     /// </summary>
-    /// <param name="userId">The ID of the user to check.</param>
-    /// <param name="purpose">The purpose of the verification to check.</param>
-    /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
-    /// <returns>Returns true if an active verification exists, false otherwise.</returns>
+    /// <param name="userId">The user identifier.</param>
+    /// <param name="purpose">The verification purpose.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    /// <returns>True if an active verification exists; otherwise, false.</returns>
     Task<bool> ExistsActiveVerificationAsync(Ulid userId, UserVerificationPurpose purpose, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Adds a new user verification record to the repository.
+    /// Adds a user verification.
     /// </summary>
-    /// <param name="userVerification">The user verification record to add.</param>
-    /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+    /// <param name="userVerification">The user verification to add.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
     Task AddAsync(UserVerification userVerification, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Updates an existing user verification record in the repository.
+    /// Updates a user verification.
     /// </summary>
-    /// <param name="userVerification">The user verification record to update.</param>
-    /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+    /// <param name="userVerification">The user verification to update.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task UpdateAsync(UserVerification userVerification, CancellationToken cancellationToken);
 }

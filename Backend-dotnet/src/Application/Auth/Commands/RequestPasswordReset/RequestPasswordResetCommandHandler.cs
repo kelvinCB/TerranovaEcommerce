@@ -1,6 +1,5 @@
 using Application.Common.Abstractions.Persistence;
 using Application.Common.Abstractions.Services;
-using Application.Common.Exceptions;
 using Domain.Entities;
 using Domain.ValueObjects;
 using MediatR;
