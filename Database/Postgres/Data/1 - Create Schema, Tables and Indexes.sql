@@ -238,7 +238,9 @@ CREATE TABLE terranova.users (
   created_at timestamptz NOT NULL DEFAULT NOW(),
   updated_at timestamptz NOT NULL DEFAULT NOW(),
   email_address varchar(255) NOT NULL UNIQUE,
-  is_deleted boolean NOT NULL DEFAULT FALSE
+  is_deleted boolean NOT NULL DEFAULT FALSE,
+  is_email_address_verified boolean NOT NULL DEFAULT FALSE,
+  is_phone_number_verified boolean NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE terranova.wish_list (
