@@ -14,7 +14,7 @@ namespace Application.Auth.Commands.ResetPassword;
 public sealed class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand, Unit>
 {
     // Variables
-    private readonly UserVerificationPurpose userVerificationPurpose = UserVerificationPurpose.PasswordReset;
+    private static readonly UserVerificationPurpose userVerificationPurpose = UserVerificationPurpose.PasswordReset;
 
     // Dependencies
     private readonly IRefreshTokenRepository _refreshTokenRepository;

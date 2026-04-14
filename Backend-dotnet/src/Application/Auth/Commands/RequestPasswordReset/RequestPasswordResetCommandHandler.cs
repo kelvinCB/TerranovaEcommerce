@@ -13,7 +13,7 @@ namespace Application.Auth.Commands.RequestPasswordReset;
 public sealed class RequestPasswordResetCommandHandler : IRequestHandler<RequestPasswordResetCommand, Unit>
 {
     // Variables
-    private readonly UserVerificationPurpose userVerificationPurpose = UserVerificationPurpose.PasswordReset;
+    private static readonly UserVerificationPurpose userVerificationPurpose = UserVerificationPurpose.PasswordReset;
 
     // Dependencies
     private readonly IUnitOfWork _unitOfWork;
@@ -21,6 +21,7 @@ public sealed class RequestPasswordResetCommandHandler : IRequestHandler<Request
     private readonly IUserVerificationRepository _userVerificationRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IIdGenerator _idGenerator;
+    private readonly INotificationService _notificationService;
     private readonly IVerificationCodeGenerator _verificationCodeGenerator;
 
     /// <summary>
@@ -31,6 +32,7 @@ public sealed class RequestPasswordResetCommandHandler : IRequestHandler<Request
     /// <param name="userVerificationRepository">The user verification repository.</param>
     /// <param name="dateTimeProvider">The date and time provider.</param>
     /// <param name="idGenerator">The ID generator.</param>
+    /// <param name="notificationService">The notification service.</param>
     /// <param name="verificationCodeGenerator">The verification code generator.</param>
     /// <exception cref="ArgumentNullException">Thrown when any of the dependencies is null.</exception>
     public RequestPasswordResetCommandHandler(
@@ -39,6 +41,7 @@ public sealed class RequestPasswordResetCommandHandler : IRequestHandler<Request
         IUserVerificationRepository userVerificationRepository,
         IDateTimeProvider dateTimeProvider,
         IIdGenerator idGenerator,
+        INotificationService notificationService,
         IVerificationCodeGenerator verificationCodeGenerator)
     {
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
@@ -46,6 +49,7 @@ public sealed class RequestPasswordResetCommandHandler : IRequestHandler<Request
         _userVerificationRepository = userVerificationRepository ?? throw new ArgumentNullException(nameof(userVerificationRepository));
         _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         _idGenerator = idGenerator ?? throw new ArgumentNullException(nameof(idGenerator));
+        _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
         _verificationCodeGenerator = verificationCodeGenerator ?? throw new ArgumentNullException(nameof(verificationCodeGenerator));
     }
 
@@ -58,10 +62,9 @@ public sealed class RequestPasswordResetCommandHandler : IRequestHandler<Request
     /// <remarks>Once the user verification is created, it takes 5 minutes to expire.</remarks>
     public async Task<Unit> Handle(RequestPasswordResetCommand request, CancellationToken cancellationToken)
     {
-        var emailAddress = Email.Create(request.EmailAddress);
-        var user = await _userRepository.GetByEmailAsync(emailAddress, cancellationToken);
+        var user = await GetValidUserAsync(request, cancellationToken);
 
-        if (user is null || user.IsDeleted)
+        if (user is null)
         {
             return Unit.Value;
         }
@@ -77,20 +80,37 @@ public sealed class RequestPasswordResetCommandHandler : IRequestHandler<Request
             return Unit.Value;
         }
 
-        var userVerification = CreateUserVerification(user);
+        var generatedVerificationCode = _verificationCodeGenerator.Generate();
+
+        var userVerification = CreateUserVerification(user, generatedVerificationCode.Code);
 
         await _userVerificationRepository.AddAsync(userVerification, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        await SendPasswordResetCodeAsync(user.EmailAddress.Value, generatedVerificationCode.PlainTextCode, cancellationToken);
 
         return Unit.Value;
     }
 
     // Private methods
 
-    private UserVerification CreateUserVerification(User user)
+    private async Task<User?> GetValidUserAsync(RequestPasswordResetCommand request, CancellationToken cancellationToken)
+    {
+        var email = Email.Create(request.EmailAddress);
+        var user = await _userRepository.GetByEmailAsync(email, cancellationToken);
+
+        if (user is null || user.IsDeleted)
+        {
+            return null;
+        }
+
+        return user;
+    }
+
+    private UserVerification CreateUserVerification(User user, Code code)
     {
         var verificationId = _idGenerator.NewUlid();
-        var verificationCode = _verificationCodeGenerator.Generate();
+        var verificationCode = code;
         var now = _dateTimeProvider.Timestamp;
 
         var userVerification = UserVerification.Create(
@@ -103,5 +123,10 @@ public sealed class RequestPasswordResetCommandHandler : IRequestHandler<Request
         );
 
         return userVerification;
+    }
+
+    private async Task SendPasswordResetCodeAsync(string email, string codePlainText, CancellationToken cancellationToken)
+    {
+        await _notificationService.SendPasswordResetCodeToEmailAsync(email, codePlainText, cancellationToken);
     }
 }
