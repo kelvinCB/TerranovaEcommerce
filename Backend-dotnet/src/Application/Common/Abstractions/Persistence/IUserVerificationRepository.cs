@@ -9,13 +9,14 @@ namespace Application.Common.Abstractions.Persistence;
 public interface IUserVerificationRepository
 {
     /// <summary>
-    /// Retrieves an active verification for the specified user and purpose.
+    /// Retrieves an active verification for the specified user, purpose and code.
     /// </summary>
     /// <param name="userId">The user identifier.</param>
     /// <param name="purpose">The verification purpose.</param>
+    /// <param name="code">The verification code.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>The active verification if found; otherwise, null.</returns>
-    Task<UserVerification?> GetActiveByUserIdAndPurposeAsync(Ulid userId, UserVerificationPurpose purpose, CancellationToken cancellationToken);
+    Task<UserVerification?> GetActiveByUserIdPurposeAndCodeAsync(Ulid userId, UserVerificationPurpose purpose, Code code, CancellationToken cancellationToken);
 
     /// <summary>
     /// Determines whether an active verification exists for the specified user and purpose.
