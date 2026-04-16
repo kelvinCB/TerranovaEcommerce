@@ -21,6 +21,8 @@ public class User
     public DateTimeOffset UpdatedAt { get; private set; }
     public Email EmailAddress { get; private set; } = null!;
     public bool IsDeleted { get; private set; }
+    public bool IsEmailAddressVerified { get; private set; }
+    public bool IsPhoneNumberVerified { get; private set; }
 
     /// <summary>
     /// Initializes a new instance of the User class with the specified parameters.
@@ -36,6 +38,8 @@ public class User
     /// <param name="updatedAt">The timestamp when the user was last updated.</param>
     /// <param name="emailAddress">The email address of the user.</param>
     /// <param name="isDeleted">Whether the user is deleted.</param>
+    /// <param name="isEmailAddressVerified">Whether the email address is verified.</param>
+    /// <param name="isPhoneNumberVerified">Whether the phone number is verified.</param>
     /// <param name="phoneNumber">The phone number of the user.</param>
     private User(
       Ulid id,
@@ -49,6 +53,8 @@ public class User
       DateTimeOffset updatedAt,
       Email emailAddress,
       bool isDeleted,
+      bool isEmailAddressVerified,
+      bool isPhoneNumberVerified,
       PhoneNumber? phoneNumber = null
     )
     {
@@ -64,6 +70,8 @@ public class User
         PhoneNumber = phoneNumber;
         BirthDate = birthDate;
         Gender = gender;
+        IsEmailAddressVerified = isEmailAddressVerified;
+        IsPhoneNumberVerified = isPhoneNumberVerified;
     }
 
     /// <summary>
@@ -113,6 +121,8 @@ public class User
           updatedAt: timestamp,
           emailAddress,
           isDeleted: false,
+          isEmailAddressVerified: false,
+          isPhoneNumberVerified: false,
           phoneNumber
         );
     }
@@ -237,6 +247,34 @@ public class User
         Guard.EnsureUtcNotBefore(timestamp, CreatedAt, nameof(timestamp));
 
         BirthDate = birthDate;
+        UpdatedAt = timestamp;
+    }
+
+    /// <summary>
+    /// Sets the email address verified status of the user and updates the timestamp.
+    /// </summary>
+    /// <param name="isEmailAddressVerified">The email address verified status to set for the user.</param>
+    /// <param name="timestamp">The timestamp in UTC when email address verified was set.</param>
+    public void SetIsEmailAddressVerified(bool isEmailAddressVerified, DateTimeOffset timestamp)
+    {
+        Guard.EnsureUtc(timestamp, nameof(timestamp));
+        Guard.EnsureUtcNotBefore(timestamp, CreatedAt, nameof(timestamp));
+
+        IsEmailAddressVerified = isEmailAddressVerified;
+        UpdatedAt = timestamp;
+    }
+
+    /// <summary>
+    /// Sets the phone number verified status of the user and updates the timestamp.
+    /// </summary>
+    /// <param name="isPhoneNumberVerified">The phone number verified status to set for the user.</param>
+    /// <param name="timestamp">The timestamp in UTC when phone number verified status was set.</param>
+    public void SetIsPhoneNumberVerified(bool isPhoneNumberVerified, DateTimeOffset timestamp)
+    {
+        Guard.EnsureUtc(timestamp, nameof(timestamp));
+        Guard.EnsureUtcNotBefore(timestamp, CreatedAt, nameof(timestamp));
+
+        IsPhoneNumberVerified = isPhoneNumberVerified;
         UpdatedAt = timestamp;
     }
 
