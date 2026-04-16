@@ -4,6 +4,8 @@ BEGIN;
 CREATE SCHEMA IF NOT EXISTS terranova;
 SET search_path TO terranova;
 
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+
 
 -- 2. Tablas/Tables
 
@@ -275,7 +277,7 @@ CREATE TABLE terranova.user_roles (
 CREATE TABLE terranova.user_verifications (
   id char(26) PRIMARY KEY,
   user_id char(26) NOT NULL,
-  purpose varchar(30) NOT NULL,            -- email_verify, reset_password, mfa
+  purpose varchar(30) NOT NULL,            -- email_verify, password_reset, mfa
   code_hash varchar(255) NOT NULL,
   expires_at timestamptz NOT NULL,
   consumed_at timestamptz,
@@ -528,6 +530,22 @@ ALTER TABLE terranova.users ADD CONSTRAINT chk_users_gender_valid CHECK (gender 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_refresh_tokens_jti ON terranova.refresh_tokens (jti) WHERE jti IS NOT NULL;
 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_refresh_tokens_user_not_revoked ON terranova.refresh_tokens (user_id) WHERE is_revoked = FALSE;
+
+-- user_verifications
+ALTER TABLE terranova.user_verifications DROP CONSTRAINT IF EXISTS chk_user_verifications_valid_time_window;
+ALTER TABLE terranova.user_verifications ADD CONSTRAINT chk_user_verifications_valid_time_window CHECK (expires_at > created_at);
+
+ALTER TABLE terranova.user_verifications DROP CONSTRAINT IF EXISTS chk_user_verifications_consumed_at_valid;
+ALTER TABLE terranova.user_verifications ADD CONSTRAINT chk_user_verifications_consumed_at_valid CHECK (consumed_at IS NULL OR consumed_at >= created_at);
+
+ALTER TABLE terranova.user_verifications DROP CONSTRAINT IF EXISTS ex_user_verifications_no_overlapping_active_window;
+ALTER TABLE terranova.user_verifications ADD CONSTRAINT ex_user_verifications_no_overlapping_active_window
+EXCLUDE USING gist (
+  user_id gist_bpchar_ops WITH =,
+  purpose gist_varchar_ops WITH =,
+  tstzrange(created_at, expires_at, '[)') WITH &&
+)
+WHERE (consumed_at IS NULL);
 
 -- 5. Funcciones/Functions
 
