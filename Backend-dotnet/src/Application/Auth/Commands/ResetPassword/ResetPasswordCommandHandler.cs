@@ -97,8 +97,9 @@ public sealed class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordC
 
     private async Task<UserVerification> GetValidUserVerificationAsync(Ulid userId, string code, DateTimeOffset now, CancellationToken cancellationToken)
     {
+        var normalizedCode = Code.From(code);
         var userVerification = await _userVerificationRepository
-            .GetActiveByUserIdAndPurposeAsync(userId, userVerificationPurpose, cancellationToken);
+            .GetActiveByUserIdPurposeAndCodeAsync(userId, UserVerificationPurpose.PasswordReset, normalizedCode, cancellationToken);
 
         if (
             userVerification is null

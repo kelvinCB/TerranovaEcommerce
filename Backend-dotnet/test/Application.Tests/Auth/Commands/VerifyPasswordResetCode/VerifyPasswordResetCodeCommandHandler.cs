@@ -120,7 +120,7 @@ public sealed class VerifyPasswordResetCodeCommandHandlerTests
             .Setup(x => x.GetByEmailAsync(Email.Create(command.Email), It.IsAny<CancellationToken>()))
             .ReturnsAsync(user);
         mockUserVerificationRepository
-            .Setup(x => x.GetActiveByUserIdAndPurposeAsync(user.Id, UserVerificationPurpose.PasswordReset, It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetActiveByUserIdPurposeAndCodeAsync(user.Id, UserVerificationPurpose.PasswordReset, It.Is<Code>(code => code.IsMatch(command.Code)), It.IsAny<CancellationToken>()))
             .ReturnsAsync(userVerification);
         mockDateTimeProvider.SetupGet(x => x.Timestamp).Returns(Timestamp);
 
@@ -131,7 +131,7 @@ public sealed class VerifyPasswordResetCodeCommandHandlerTests
         Assert.True(result);
         Assert.Null(userVerification.ConsumedAt);
         mockUserRepository.Verify(x => x.GetByEmailAsync(Email.Create(command.Email), CancellationToken.None), Times.Once);
-        mockUserVerificationRepository.Verify(x => x.GetActiveByUserIdAndPurposeAsync(user.Id, UserVerificationPurpose.PasswordReset, CancellationToken.None), Times.Once);
+        mockUserVerificationRepository.Verify(x => x.GetActiveByUserIdPurposeAndCodeAsync(user.Id, UserVerificationPurpose.PasswordReset, It.Is<Code>(code => code.IsMatch(command.Code)), CancellationToken.None), Times.Once);
         mockDateTimeProvider.Verify(x => x.Timestamp, Times.Once);
         mockUserVerificationRepository.Verify(x => x.UpdateAsync(It.IsAny<UserVerification>(), It.IsAny<CancellationToken>()), Times.Never);
     }
@@ -151,7 +151,7 @@ public sealed class VerifyPasswordResetCodeCommandHandlerTests
         var mockDateTimeProvider = new Mock<IDateTimeProvider>();
 
         mockUserRepository.Setup(x => x.GetByEmailAsync(Email.Create(command.Email), token)).ReturnsAsync(user);
-        mockUserVerificationRepository.Setup(x => x.GetActiveByUserIdAndPurposeAsync(user.Id, UserVerificationPurpose.PasswordReset, token)).ReturnsAsync(userVerification);
+        mockUserVerificationRepository.Setup(x => x.GetActiveByUserIdPurposeAndCodeAsync(user.Id, UserVerificationPurpose.PasswordReset, It.Is<Code>(code => code.IsMatch(command.Code)), token)).ReturnsAsync(userVerification);
         mockDateTimeProvider.SetupGet(x => x.Timestamp).Returns(Timestamp);
 
         var handler = CreateHandler(mockUserRepository, mockUserVerificationRepository, mockDateTimeProvider);
@@ -159,7 +159,7 @@ public sealed class VerifyPasswordResetCodeCommandHandlerTests
         await handler.Handle(command, token);
 
         mockUserRepository.Verify(x => x.GetByEmailAsync(Email.Create(command.Email), token), Times.Once);
-        mockUserVerificationRepository.Verify(x => x.GetActiveByUserIdAndPurposeAsync(user.Id, UserVerificationPurpose.PasswordReset, token), Times.Once);
+        mockUserVerificationRepository.Verify(x => x.GetActiveByUserIdPurposeAndCodeAsync(user.Id, UserVerificationPurpose.PasswordReset, It.Is<Code>(code => code.IsMatch(command.Code)), token), Times.Once);
         mockUserVerificationRepository.Verify(x => x.UpdateAsync(It.IsAny<UserVerification>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -181,7 +181,7 @@ public sealed class VerifyPasswordResetCodeCommandHandlerTests
         var result = await handler.Handle(command, CancellationToken.None);
 
         Assert.False(result);
-        mockUserVerificationRepository.Verify(x => x.GetActiveByUserIdAndPurposeAsync(It.IsAny<Ulid>(), It.IsAny<UserVerificationPurpose>(), It.IsAny<CancellationToken>()), Times.Never);
+        mockUserVerificationRepository.Verify(x => x.GetActiveByUserIdPurposeAndCodeAsync(It.IsAny<Ulid>(), It.IsAny<UserVerificationPurpose>(), It.IsAny<Code>(), It.IsAny<CancellationToken>()), Times.Never);
         mockDateTimeProvider.Verify(x => x.Timestamp, Times.Never);
         mockUserVerificationRepository.Verify(x => x.UpdateAsync(It.IsAny<UserVerification>(), It.IsAny<CancellationToken>()), Times.Never);
     }
@@ -206,7 +206,7 @@ public sealed class VerifyPasswordResetCodeCommandHandlerTests
         var result = await handler.Handle(command, CancellationToken.None);
 
         Assert.False(result);
-        mockUserVerificationRepository.Verify(x => x.GetActiveByUserIdAndPurposeAsync(It.IsAny<Ulid>(), It.IsAny<UserVerificationPurpose>(), It.IsAny<CancellationToken>()), Times.Never);
+        mockUserVerificationRepository.Verify(x => x.GetActiveByUserIdPurposeAndCodeAsync(It.IsAny<Ulid>(), It.IsAny<UserVerificationPurpose>(), It.IsAny<Code>(), It.IsAny<CancellationToken>()), Times.Never);
         mockDateTimeProvider.Verify(x => x.Timestamp, Times.Never);
         mockUserVerificationRepository.Verify(x => x.UpdateAsync(It.IsAny<UserVerification>(), It.IsAny<CancellationToken>()), Times.Never);
     }
@@ -225,7 +225,7 @@ public sealed class VerifyPasswordResetCodeCommandHandlerTests
             .Setup(x => x.GetByEmailAsync(Email.Create(command.Email), It.IsAny<CancellationToken>()))
             .ReturnsAsync(user);
         mockUserVerificationRepository
-            .Setup(x => x.GetActiveByUserIdAndPurposeAsync(user.Id, UserVerificationPurpose.PasswordReset, It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetActiveByUserIdPurposeAndCodeAsync(user.Id, UserVerificationPurpose.PasswordReset, It.Is<Code>(code => code.IsMatch(command.Code)), It.IsAny<CancellationToken>()))
             .ReturnsAsync((UserVerification?)null);
         mockDateTimeProvider.SetupGet(x => x.Timestamp).Returns(Timestamp);
 
@@ -249,7 +249,7 @@ public sealed class VerifyPasswordResetCodeCommandHandlerTests
         var mockDateTimeProvider = new Mock<IDateTimeProvider>();
 
         mockUserRepository.Setup(x => x.GetByEmailAsync(Email.Create(command.Email), It.IsAny<CancellationToken>())).ReturnsAsync(user);
-        mockUserVerificationRepository.Setup(x => x.GetActiveByUserIdAndPurposeAsync(user.Id, UserVerificationPurpose.PasswordReset, It.IsAny<CancellationToken>())).ReturnsAsync(userVerification);
+        mockUserVerificationRepository.Setup(x => x.GetActiveByUserIdPurposeAndCodeAsync(user.Id, UserVerificationPurpose.PasswordReset, It.Is<Code>(code => code.IsMatch(command.Code)), It.IsAny<CancellationToken>())).ReturnsAsync((UserVerification?)null);
         mockDateTimeProvider.SetupGet(x => x.Timestamp).Returns(Timestamp);
 
         var handler = CreateHandler(mockUserRepository, mockUserVerificationRepository, mockDateTimeProvider);
@@ -273,7 +273,7 @@ public sealed class VerifyPasswordResetCodeCommandHandlerTests
         var mockDateTimeProvider = new Mock<IDateTimeProvider>();
 
         mockUserRepository.Setup(x => x.GetByEmailAsync(Email.Create(command.Email), It.IsAny<CancellationToken>())).ReturnsAsync(user);
-        mockUserVerificationRepository.Setup(x => x.GetActiveByUserIdAndPurposeAsync(user.Id, UserVerificationPurpose.PasswordReset, It.IsAny<CancellationToken>())).ReturnsAsync(userVerification);
+        mockUserVerificationRepository.Setup(x => x.GetActiveByUserIdPurposeAndCodeAsync(user.Id, UserVerificationPurpose.PasswordReset, It.Is<Code>(code => code.IsMatch(command.Code)), It.IsAny<CancellationToken>())).ReturnsAsync(userVerification);
         mockDateTimeProvider.SetupGet(x => x.Timestamp).Returns(Timestamp);
 
         var handler = CreateHandler(mockUserRepository, mockUserVerificationRepository, mockDateTimeProvider);
@@ -298,7 +298,7 @@ public sealed class VerifyPasswordResetCodeCommandHandlerTests
         var mockDateTimeProvider = new Mock<IDateTimeProvider>();
 
         mockUserRepository.Setup(x => x.GetByEmailAsync(Email.Create(command.Email), It.IsAny<CancellationToken>())).ReturnsAsync(user);
-        mockUserVerificationRepository.Setup(x => x.GetActiveByUserIdAndPurposeAsync(user.Id, UserVerificationPurpose.PasswordReset, It.IsAny<CancellationToken>())).ReturnsAsync(userVerification);
+        mockUserVerificationRepository.Setup(x => x.GetActiveByUserIdPurposeAndCodeAsync(user.Id, UserVerificationPurpose.PasswordReset, It.Is<Code>(code => code.IsMatch(command.Code)), It.IsAny<CancellationToken>())).ReturnsAsync(userVerification);
         mockDateTimeProvider.SetupGet(x => x.Timestamp).Returns(Timestamp);
 
         var handler = CreateHandler(mockUserRepository, mockUserVerificationRepository, mockDateTimeProvider);
