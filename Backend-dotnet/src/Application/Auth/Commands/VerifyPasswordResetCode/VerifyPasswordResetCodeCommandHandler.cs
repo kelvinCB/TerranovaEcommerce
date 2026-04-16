@@ -50,7 +50,8 @@ public sealed class VerifyPasswordResetCodeCommandHandler : IRequestHandler<Veri
             return false;
         }
 
-        var userVerification = await _userVerificationRepository.GetActiveByUserIdAndPurposeAsync(user.Id, UserVerificationPurpose.PasswordReset, cancellationToken);
+        var code = Code.From(request.Code);
+        var userVerification = await _userVerificationRepository.GetActiveByUserIdPurposeAndCodeAsync(user.Id, UserVerificationPurpose.PasswordReset, code, cancellationToken);
         var now = _dateTimeProvider.Timestamp;
 
         if (
