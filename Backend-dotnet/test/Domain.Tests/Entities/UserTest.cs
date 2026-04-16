@@ -912,4 +912,138 @@ public class UserTest
         Assert.Contains("Cannot be before", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
+    [Fact]
+    [Trait("User", "SetIsEmailAddressVerified")]
+    public void SetIsEmailAddressVerified_ShouldSetEmailAddressVerified_WhenParametersAreValid()
+    {
+        // Arrange
+        var user = UserTestFactory.CreateUser();
+        var isEmailAddressVerified = true;
+        var timestamp = user.CreatedAt.AddMinutes(1);
+
+        // Act
+        var exception = Record.Exception(() => user.SetIsEmailAddressVerified(isEmailAddressVerified, timestamp));
+        
+        // Fact
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    [Trait("User", "SetIsEmailAddressVerified")]
+    public void SetIsEmailAddressVerified_ShouldThrowException_WhenTimestampIsUninitialized()
+    {
+        // Arrange
+        var user = UserTestFactory.CreateUser();
+        var isEmailAddressVerified = true;
+        DateTimeOffset timestamp = default;
+
+        // Act
+        var exception = Assert.Throws<ArgumentException>(() => user.SetIsEmailAddressVerified(isEmailAddressVerified, timestamp));
+
+        // Fact
+        Assert.NotNull(exception);
+        Assert.Contains("Is uninitialized", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    [Trait("User", "SetIsEmailAddressVerified")]
+    public void SetIsEmailAddressVerified_ShouldThrowException_WhenTimestampIsNotUtc()
+    {
+        // Arrange
+        var user = UserTestFactory.CreateUser();
+        var isEmailAddressVerified = true;
+        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4)); // It's not UTC
+
+        // Act
+        var exception = Assert.Throws<ArgumentException>(() => user.SetIsEmailAddressVerified(isEmailAddressVerified, timestamp));
+
+        // Fact
+        Assert.NotNull(exception);
+        Assert.Contains("Must be in UTC", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    [Trait("User", "SetIsEmailAddressVerified")]
+    public void SetIsEmailAddressVerified_ShouldThrowException_WhenTimestampIsBeforeCreatedAt()
+    {
+        // Arrange
+        var user = UserTestFactory.CreateUser();
+        var isEmailAddressVerified = true;
+        var timestamp = user.CreatedAt.AddMinutes(-1);
+
+        // Act
+        var exception = Assert.Throws<ArgumentException>(() => user.SetIsEmailAddressVerified(isEmailAddressVerified, timestamp));
+
+        // Fact
+        Assert.NotNull(exception);
+        Assert.Contains("Cannot be before", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    [Trait("User", "SetIsPhoneNumberVerified")]
+    public void SetIsPhoneNumberVerified_ShouldSetPhoneNumberVerified_WhenParametersAreValid()
+    {
+        // Arrange
+        var user = UserTestFactory.CreateUser();
+        var isPhoneNumberVerified = true;
+        var timestamp = user.CreatedAt.AddMinutes(1);
+
+        // Act
+        var exception = Record.Exception(() => user.SetIsPhoneNumberVerified(isPhoneNumberVerified, timestamp));
+
+        // Fact
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    [Trait("User", "SetIsPhoneNumberVerified")]
+    public void SetIsPhoneNumberVerified_ShouldThrowException_WhenTimestampIsUninitialized()
+    {
+        // Arrange
+        var user = UserTestFactory.CreateUser();
+        var isPhoneNumberVerified = true;
+        DateTimeOffset timestamp = default;
+
+        // Act
+        var exception = Assert.Throws<ArgumentException>(() => user.SetIsPhoneNumberVerified(isPhoneNumberVerified, timestamp));
+
+        // Fact
+        Assert.NotNull(exception);
+        Assert.Contains("Is uninitialized", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    [Trait("User", "SetIsPhoneNumberVerified")]
+    public void SetIsPhoneNumberVerified_ShouldThrowException_WhenTimestampIsNotUtc()
+    {
+        // Arrange
+        var user = UserTestFactory.CreateUser();
+        var isPhoneNumberVerified = true;
+        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.FromHours(-4)); // It's not UTC
+
+        // Act
+        var exception = Assert.Throws<ArgumentException>(() => user.SetIsPhoneNumberVerified(isPhoneNumberVerified, timestamp));
+
+        // Fact
+        Assert.NotNull(exception);
+        Assert.Contains("Must be in UTC", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    [Trait("User", "SetIsPhoneNumberVerified")]
+    public void SetIsPhoneNumberVerified_ShouldThrowException_WhenTimestampIsBeforeCreatedAt()
+    {
+        // Arrange
+        var user = UserTestFactory.CreateUser();
+        var isPhoneNumberVerified = true;
+        var timestamp = user.CreatedAt.AddMinutes(-1);
+
+        // Act
+        var exception = Assert.Throws<ArgumentException>(() => user.SetIsPhoneNumberVerified(isPhoneNumberVerified, timestamp));
+
+        // Fact
+        Assert.NotNull(exception);
+        Assert.Contains("Cannot be before", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
 }
