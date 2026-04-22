@@ -44,8 +44,12 @@ public class UserTest
         Assert.Equal(gender, user.Gender);
         Assert.Equal(passwordHash, user.PasswordHash);
         Assert.Equal(timestamp, user.CreatedAt);
+        Assert.Equal(timestamp, user.UpdatedAt);
         Assert.Equal(emailAddress, user.EmailAddress);
         Assert.Equal(phoneNumber, user.PhoneNumber);
+        Assert.False(user.IsDeleted);
+        Assert.False(user.IsEmailAddressVerified);
+        Assert.False(user.IsPhoneNumberVerified);
     }
 
     [Fact]
@@ -920,12 +924,16 @@ public class UserTest
         var user = UserTestFactory.CreateUser();
         var isEmailAddressVerified = true;
         var timestamp = user.CreatedAt.AddMinutes(1);
+        var previousUpdatedAt = user.UpdatedAt;
 
         // Act
         var exception = Record.Exception(() => user.SetIsEmailAddressVerified(isEmailAddressVerified, timestamp));
         
         // Fact
         Assert.Null(exception);
+        Assert.True(user.IsEmailAddressVerified);
+        Assert.Equal(timestamp, user.UpdatedAt);
+        Assert.NotEqual(previousUpdatedAt, user.UpdatedAt);
     }
 
     [Fact]
@@ -987,12 +995,16 @@ public class UserTest
         var user = UserTestFactory.CreateUser();
         var isPhoneNumberVerified = true;
         var timestamp = user.CreatedAt.AddMinutes(1);
+        var previousUpdatedAt = user.UpdatedAt;
 
         // Act
         var exception = Record.Exception(() => user.SetIsPhoneNumberVerified(isPhoneNumberVerified, timestamp));
 
         // Fact
         Assert.Null(exception);
+        Assert.True(user.IsPhoneNumberVerified);
+        Assert.Equal(timestamp, user.UpdatedAt);
+        Assert.NotEqual(previousUpdatedAt, user.UpdatedAt);
     }
 
     [Fact]
