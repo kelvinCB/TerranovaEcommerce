@@ -36,10 +36,10 @@ public sealed class VerifyEmailCommandHandler : IRequestHandler<VerifyEmailComma
         IDateTimeProvider dateTimeProvider
     )
     {
-        _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(IUnitOfWork));
-        _userRepository = userRepository ?? throw new ArgumentNullException(nameof(IUserRepository));
-        _userVerificationRepository = userVerificationRepository ?? throw new ArgumentNullException(nameof(IUserVerificationRepository));
-        _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(IDateTimeProvider));
+        _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+        _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
+        _userVerificationRepository = userVerificationRepository ?? throw new ArgumentNullException(nameof(userVerificationRepository));
+        _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
     }
 
     /// <summary>
