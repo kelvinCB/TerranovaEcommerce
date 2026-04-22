@@ -19,6 +19,8 @@ public sealed class UserDto
     public required DateTimeOffset UpdatedAt { get; init; }
     public required string EmailAddress { get; init; }
     public required bool IsDeleted { get; init; }
+    public bool IsEmailAddressVerified { get; init; }
+    public bool IsPhoneNumberVerified { get; init; }
     public IReadOnlyCollection<RoleDto> Roles { get; init; } = [];
 
     /// <summary>
@@ -40,6 +42,8 @@ public sealed class UserDto
         UpdatedAt = user.UpdatedAt,
         EmailAddress = user.EmailAddress.Value,
         IsDeleted = user.IsDeleted,
+        IsEmailAddressVerified = user.IsEmailAddressVerified,
+        IsPhoneNumberVerified = user.IsPhoneNumberVerified,
         Roles = roles.Select(x => RoleDto.FromDomain(x)).ToList()
     };
 }
