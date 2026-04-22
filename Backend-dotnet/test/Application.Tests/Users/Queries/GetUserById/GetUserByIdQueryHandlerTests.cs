@@ -1,7 +1,6 @@
 using Application.Users.Queries.GetUserById;
 using Application.Common.Abstractions.Persistence;
 using Domain.Entities;
-using Domain.ValueObjects;
 using Moq;
 using Application.Common.Exceptions;
 using Common.Tests.Factories;
@@ -59,6 +58,8 @@ public sealed class GetUserByIdQueryHandlerTests
         // Arrange
 
         var user = UserTestFactory.CreateUser();
+        user.SetIsEmailAddressVerified(true, user.UpdatedAt.AddMinutes(1));
+        user.SetIsPhoneNumberVerified(true, user.UpdatedAt.AddMinutes(1));
 
         var role = new List<Role>();
 
@@ -95,6 +96,8 @@ public sealed class GetUserByIdQueryHandlerTests
         Assert.Equal(user.UpdatedAt, result.UpdatedAt);
         Assert.Equal(user.EmailAddress.Value, result.EmailAddress);
         Assert.Equal(user.IsDeleted, result.IsDeleted);
+        Assert.Equal(user.IsEmailAddressVerified, result.IsEmailAddressVerified);
+        Assert.Equal(user.IsPhoneNumberVerified, result.IsPhoneNumberVerified);
         Assert.Equal(user.PhoneNumber?.Value, result.PhoneNumber);
         Assert.NotNull(result.Roles);
         Assert.True(role.All(x => result.Roles.Select(x => x.Id).Contains(x.Id)));

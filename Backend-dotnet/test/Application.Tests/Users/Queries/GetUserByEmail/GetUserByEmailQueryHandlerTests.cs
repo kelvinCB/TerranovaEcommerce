@@ -58,6 +58,8 @@ public sealed class GetUserByEmailQueryHandlerTests
     {
         // Arrange
         var user = UserTestFactory.CreateUser();
+        user.SetIsEmailAddressVerified(true, user.UpdatedAt.AddMinutes(1));
+        user.SetIsPhoneNumberVerified(true, user.UpdatedAt.AddMinutes(1));
 
         var role = new List<Role>();
 
@@ -94,6 +96,8 @@ public sealed class GetUserByEmailQueryHandlerTests
         Assert.Equal(user.UpdatedAt, result.UpdatedAt);
         Assert.Equal(user.EmailAddress.Value, result.EmailAddress);
         Assert.Equal(user.IsDeleted, result.IsDeleted);
+        Assert.Equal(user.IsEmailAddressVerified, result.IsEmailAddressVerified);
+        Assert.Equal(user.IsPhoneNumberVerified, result.IsPhoneNumberVerified);
         Assert.Equal(user.PhoneNumber?.Value, result.PhoneNumber);
         Assert.NotEmpty(result.Roles);
         Assert.True(role.All(x => result.Roles.Select(y => y.Id).Contains(x.Id)));
